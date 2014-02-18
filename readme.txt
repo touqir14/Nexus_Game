@@ -24,5 +24,3 @@ History will be a list of lists. Each sub-list will contain all the information 
 Each object has a unique ID
 Each object gets an odor
 Each odor type has a unique ID but more than one object can have the same odor type
-
-hello
