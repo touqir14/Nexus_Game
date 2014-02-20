@@ -6,6 +6,9 @@ Created on 2014-02-19
 The global values of the simulation.
 Stored here for easy access.
 '''
+from pygame import sprite
+from pygame.colordict import THECOLORS
+from random import Random
 
 # setup
 resolution = (800,600)
@@ -13,9 +16,35 @@ env_size = (resolution[0],500)
 info_size = (resolution[0],100)
 fps = 30
 
-# each loop in 'main.py' will be tracked by timeStep
+# random object with seed
+rand = Random()
+rand.seed(12)
+
+# colours
+pro_colour = THECOLORS['red3']
+basicFoodColour = THECOLORS['forestgreen']
+
+# sizes
+basicFoodDiameter = 20
+protagonistDiameter = 20
+
+# simulation
+pro_starting_point = (env_size[0]-int(protagonistDiameter/2),env_size[1]-int(protagonistDiameter/2))
+pro_speed = 22
+startingFood = 10
+allObjects = sprite.Group()
+protagonist = sprite.GroupSingle()
+#food = sprite.Group()
+
+# each loop of the simulation will be tracked by timeStep
 timeStep = 0
 
 # a dictionary of the different odors in the environment
 # the keys are the class types
 odors = []
+
+# keyboard input stuff
+up = False
+down = False
+left = False
+right = False

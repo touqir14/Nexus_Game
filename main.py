@@ -9,7 +9,15 @@ import os, sys, pygame
 from pygame.locals import *
 import parameters as p
 from pygame.colordict import THECOLORS
+from simulation import Simulation
+from basicFood import BasicFood
 
+def imageSetup():
+    """ Should find another way to do this """
+    BasicFood.image = BasicFood.image.convert_alpha()
+    BasicFood.image.fill((0,0,0,0))
+    pygame.draw.circle(BasicFood.image,p.basicFoodColour,BasicFood.image.get_rect().center,int(BasicFood.image.get_rect().width/2))
+    
 if __name__ == '__main__':
     # put the window in the centre of your monitor
     os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
@@ -21,6 +29,12 @@ if __name__ == '__main__':
     env_screen = pygame.Surface(p.env_size)
     # information display surface
     info_screen = pygame.Surface(p.info_size)
+    
+    # other housekeeping (some image setup needs to go after 'pygame.init()')
+    imageSetup()
+    
+    # create a new simulation
+    sim = Simulation()
     
     # create a clock to time the simulation
     clock = pygame.time.Clock()
@@ -35,13 +49,43 @@ if __name__ == '__main__':
                 sys.exit()
             if e.type == KEYDOWN:
                 if e.key == K_UP:
+                    p.up = True
                     print("{}".format(p.odors))
+                if e.key == K_DOWN:
+                    p.down = True
+                if e.key == K_LEFT:
+                    p.left = True
+                if e.key == K_RIGHT:
+                    p.right = True
+            if e.type == KEYUP:
+                if e.key == K_UP:
+                    p.up = False
+                if e.key == K_DOWN:
+                    p.down = False
+                if e.key == K_LEFT:
+                    p.left = False
+                if e.key == K_RIGHT:
+                    p.right = False
+
+        # user controlled movement of protagonist
+        if p.up == True:
+            p.protagonist.sprite.move('up')
+        if p.down == True:
+            p.protagonist.sprite.move('down')
+        if p.left == True:
+            p.protagonist.sprite.move('left')
+        if p.right == True:
+            p.protagonist.sprite.move('right')
         
         # cover old screen with a healthy coat of grey
         env_screen.fill(THECOLORS['grey'])
-        info_screen.fill(THECOLORS['purple'])       # <--(might not erase this display every loop)
+        info_screen.fill(THECOLORS['purple'])       # <--(might not want to erase this display every loop)
         
         # run simulation
+        sim.run(env_screen)
+        
+        # draw the environment
+        p.allObjects.draw(env_screen)
         
         # flip the screen
         screen.blit(env_screen,(0,0))
@@ -50,7 +94,5 @@ if __name__ == '__main__':
                 
         # delay the simulation if it is running too fast
         clock.tick(p.fps)
-        
-        # advance timeStep
-        p.timeStep += 1
-        
+
+    
