@@ -29,7 +29,7 @@ class Protagonist(Sprite, Movable):
         self.rect = Protagonist.image.get_rect()
         
         ## required by Movable()
-        Movable.__init__(self, p.pro_speed)
+        Movable.__init__(self, p.pro_max_speed)
         
         # add instance to simulation list groups and control group
         p.allObjects.add(self)
@@ -37,5 +37,23 @@ class Protagonist(Sprite, Movable):
         # give position
         self.rect.center = p.pro_starting_point
         self.pos = (float(self.rect.center[0]),float(self.rect.center[1]))
+        # give health and endurance
+        self.health = p.pro_max_health
+        self.endurance = p.pro_max_endurance
         
-        
+    def update(self):
+        """
+        put AI stuff here
+        """
+        self.endurance += p.endurance_increase
+        if self.endurance > p.pro_max_endurance:
+            self.endurance = p.pro_max_endurance
+            
+        endurancePercent = self.endurance / p.pro_max_endurance
+        self.speed = p.pro_max_speed * endurancePercent
+    
+    def move(self, direction=None):
+        Movable.move(self, direction=direction)
+        self.endurance -= p.endurance_decrease
+        if self.endurance <= 0:
+            self.endurance = 0.0

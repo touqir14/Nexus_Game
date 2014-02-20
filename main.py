@@ -68,14 +68,16 @@ if __name__ == '__main__':
                     p.right = False
 
         # user controlled movement of protagonist
-        if p.up == True:
-            p.protagonist.sprite.move('up')
-        if p.down == True:
-            p.protagonist.sprite.move('down')
-        if p.left == True:
-            p.protagonist.sprite.move('left')
-        if p.right == True:
-            p.protagonist.sprite.move('right')
+        pro = p.protagonist.sprite
+        if pro:
+            if p.up == True:
+                pro.move('up')
+            if p.down == True:
+                pro.move('down')
+            if p.left == True:
+                pro.move('left')
+            if p.right == True:
+                pro.move('right')
         
         # cover old screen with a healthy coat of grey
         env_screen.fill(THECOLORS['grey'])
@@ -86,6 +88,9 @@ if __name__ == '__main__':
         
         # draw the environment
         p.allObjects.draw(env_screen)
+        
+        # show the numbers and life bars
+        sim.displayStats(info_screen)
         
         # flip the screen
         screen.blit(env_screen,(0,0))

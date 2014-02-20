@@ -30,7 +30,13 @@ protagonistDiameter = 20
 
 # simulation
 pro_starting_point = (env_size[0]-int(protagonistDiameter/2),env_size[1]-int(protagonistDiameter/2))
-pro_speed = 22
+pro_max_speed = 22.0
+pro_max_health = 100.0
+health_step_decrease = 0.01
+pro_max_endurance = 100.0
+endurance_decrease = 0.3
+endurance_increase = 0.1
+        
 startingFood = 10
 allObjects = sprite.Group()
 protagonist = sprite.GroupSingle()

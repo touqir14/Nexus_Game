@@ -6,6 +6,8 @@ Created on 2014-02-19
 from basicFood import BasicFood
 import parameters as p
 from protagonist import Protagonist
+import pygame
+from pygame.colordict import THECOLORS
 
 class Simulation():
     '''
@@ -31,8 +33,60 @@ class Simulation():
         # create antagonist
 
     def run(self, env_screen):
+        """
+        calling this function represents one time step of the simulation
+        """
+        # update necessary things
+        p.protagonist.update()
+        
+        
+        # decrease health and check for death
+        pro = p.protagonist.sprite
+        if pro:
+            pro.health -= p.health_step_decrease
+            if pro.health <= 0:
+                pro.kill()
         
         # increment time step
         p.timeStep += 1
     
+    def displayStats(self, screen):
+        # boarder of health bar for protagonist
+        proHealthBar = pygame.Surface((p.info_size[0]-18,12))
+        proHealthBar.fill(THECOLORS['black'])
+
+        # back of health bar for protagonist
+        back = pygame.Surface((proHealthBar.get_width()-2,proHealthBar.get_height()-2))
+        back.fill(THECOLORS['red'])
+        proHealthBar.blit(back,(1,1))
+
+        # front of health bar for protagonist
+        pro = p.protagonist.sprite
+        if pro:
+            healthPercent = pro.health / p.pro_max_health
+            front = pygame.Surface(((proHealthBar.get_width()-2)*healthPercent,proHealthBar.get_height()-2))
+            front.fill(THECOLORS['green'])
+            proHealthBar.blit(front,(1,1))
+
+        screen.blit(proHealthBar,(9,9))
+
+        # boarder of endurance bar for protagonist
+        proEnduranceBar = pygame.Surface((p.info_size[0]-18,12))
+        proEnduranceBar.fill(THECOLORS['black'])
+
+        # back of endurance bar for protagonist
+        back = pygame.Surface((proEnduranceBar.get_width()-2,proEnduranceBar.get_height()-2))
+        back.fill(THECOLORS['red'])
+        proEnduranceBar.blit(back,(1,1))
+
+        # front of endurance bar for protagonist
+        pro = p.protagonist.sprite
+        if pro:
+            endurancePercent = pro.endurance / p.pro_max_endurance
+            front = pygame.Surface(((proEnduranceBar.get_width()-2)*endurancePercent,proEnduranceBar.get_height()-2))
+            front.fill(THECOLORS['deepskyblue'])
+            proEnduranceBar.blit(front,(1,1))
+
+        screen.blit(proEnduranceBar,(9,34))
+
     
