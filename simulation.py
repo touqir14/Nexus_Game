@@ -38,7 +38,7 @@ class Simulation():
         """
         # update necessary things
         p.protagonist.update()
-        
+        p.odors.update()
         
         # decrease health and check for death
         pro = p.protagonist.sprite
@@ -51,6 +51,8 @@ class Simulation():
         p.timeStep += 1
     
     def displayStats(self, screen):
+        ## protagonist health bar
+        drawText("Health:",screen,(10,1))
         # boarder of health bar for protagonist
         proHealthBar = pygame.Surface((p.info_size[0]-18,12))
         proHealthBar.fill(THECOLORS['black'])
@@ -70,6 +72,9 @@ class Simulation():
 
         screen.blit(proHealthBar,(9,9))
 
+        '''
+        ## protagonist endurance bar
+        drawText("Endurance:", screen, (10,26))
         # boarder of endurance bar for protagonist
         proEnduranceBar = pygame.Surface((p.info_size[0]-18,12))
         proEnduranceBar.fill(THECOLORS['black'])
@@ -88,5 +93,14 @@ class Simulation():
             proEnduranceBar.blit(front,(1,1))
 
         screen.blit(proEnduranceBar,(9,34))
+        '''
 
-    
+def drawText(text, screen, pos, size=15, colour=(200,255,200)):
+    """
+    helper function to simplify text to screen
+    """
+    f = pygame.font.Font(None,size)
+    t = f.render(text,1,colour)
+    screen.blit(t,pos)
+
+        

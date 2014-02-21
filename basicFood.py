@@ -12,7 +12,7 @@ class BasicFood(sprite.Sprite):
     classdocs
     '''
     # add this class to the odors list so it has a smell in the environment
-    p.odors.append(__name__)
+    #p.odors.append(__name__)
     # one image for all the food instances
     image = pygame.Surface((p.basicFoodDiameter,p.basicFoodDiameter))
 

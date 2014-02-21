@@ -81,10 +81,14 @@ if __name__ == '__main__':
         
         # cover old screen with a healthy coat of grey
         env_screen.fill(THECOLORS['grey'])
-        info_screen.fill(THECOLORS['purple'])       # <--(might not want to erase this display every loop)
+        info_screen.fill(THECOLORS['grey10'])       # <--(might not want to erase this display every loop)
         
         # run simulation
         sim.run(env_screen)
+        
+        # proliferate odors
+        for i in p.odorSources:
+            i.proliferate()
         
         # draw the environment
         p.allObjects.draw(env_screen)

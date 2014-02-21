@@ -7,3 +7,4 @@ X-add life and exhaustion meters
 -random move protagonist
 -cyclic world or bordered?
 -draw odors
+-test on ubuntu
