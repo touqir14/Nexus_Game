@@ -21,11 +21,12 @@ rand = Random()
 rand.seed(12)
 
 # colours
+env_bgc = THECOLORS['grey']
 pro_colour = THECOLORS['red3']
 basicFoodColour = THECOLORS['forestgreen']
 
 # sizes
-basicFoodDiameter = 20
+basicFoodDiameter = 15
 protagonistDiameter = 20
 
 # simulation
@@ -46,10 +47,11 @@ protagonist = sprite.GroupSingle()
 # each loop of the simulation will be tracked by timeStep
 timeStep = 0
 
-# a dictionary of the different odors in the environment
-# the keys are the class types
-odors = sprite.Group()
+# odors
+show_odors = False
 odorSources = sprite.Group()
+pro_odor_intensity = 450
+basicFood_odor_intensity = 150
 
 # keyboard input stuff
 up = False

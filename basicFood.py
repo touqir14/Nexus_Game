@@ -6,6 +6,8 @@ Created on 2014-02-19
 from pygame import sprite
 import parameters as p
 import pygame
+from odor import OdorSource
+from pygame.sprite import GroupSingle
 
 class BasicFood(sprite.Sprite):
     '''
@@ -28,3 +30,7 @@ class BasicFood(sprite.Sprite):
         self.rect = BasicFood.image.get_rect()
         self.rect.center = pos
         self.pos = (float(self.rect.center[0]),float(self.rect.center[1]))
+
+        # give this instance an odor so it has a smell in the environment
+        OdorSource(__name__,GroupSingle(self),p.basicFood_odor_intensity,p.basicFoodColour)
+        

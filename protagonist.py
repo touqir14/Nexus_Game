@@ -37,7 +37,7 @@ class Protagonist(Sprite, Movable):
         self.rect.center = p.pro_starting_point
         self.pos = (float(self.rect.center[0]),float(self.rect.center[1]))
         # give this instance an odor so it has a smell in the environment
-        OdorSource(__name__,GroupSingle(self))
+        OdorSource(__name__,GroupSingle(self),p.pro_odor_intensity,p.pro_colour)
         # give health and endurance
         self.health = p.pro_max_health
         #self.endurance = p.pro_max_endurance

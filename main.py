@@ -48,9 +48,14 @@ if __name__ == '__main__':
                 pygame.quit()
                 sys.exit()
             if e.type == KEYDOWN:
+                if e.key == K_ESCAPE:
+                    # safely exit the system
+                    pygame.quit()
+                    sys.exit()
+                if e.key == K_o:
+                    p.show_odors^=True # toggle true false
                 if e.key == K_UP:
                     p.up = True
-                    print("{}".format(p.odors))
                 if e.key == K_DOWN:
                     p.down = True
                 if e.key == K_LEFT:
@@ -80,18 +85,20 @@ if __name__ == '__main__':
                 pro.move('right')
         
         # cover old screen with a healthy coat of grey
-        env_screen.fill(THECOLORS['grey'])
+        env_screen.fill(p.env_bgc)
         info_screen.fill(THECOLORS['grey10'])       # <--(might not want to erase this display every loop)
         
         # run simulation
         sim.run(env_screen)
         
         # proliferate odors
-        for i in p.odorSources:
-            i.proliferate()
+        if p.show_odors: p.odorSources.update()
+        #for i in p.odorSources:
+        #    i.proliferate()
         
         # draw the environment
         p.allObjects.draw(env_screen)
+        if p.show_odors: p.odorSources.draw(env_screen)
         
         # show the numbers and life bars
         sim.displayStats(info_screen)

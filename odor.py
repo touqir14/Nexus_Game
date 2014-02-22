@@ -11,43 +11,65 @@ once = 0
 tid = 0
 class OdorSource(Sprite):
     '''
-    Special extension of Sprite that will not have a rect or an image. 
-    ie. will never be drawn to the screen
     '''
 
-    def __init__(self, type, sourceSprite, intensity=100):
+    def __init__(self, odor_type, sourceSpriteGroup, intensity=100, colour=(120,120,120)):
         '''
         Constructor
         '''
         Sprite.__init__(self)
+        self.image = pygame.Surface((intensity,intensity),pygame.SRCALPHA)
+        self.rect = self.image.get_rect()
         p.odorSources.add(self)
-        self.sourceSprite = sourceSprite    # must be a Group containing the sprite that the odor comes from
-        self.type = type
+        self.sourceSpriteGroup = sourceSpriteGroup    # must be a Group containing the sprite that the odor comes from
+        self.odor_type = odor_type
         self.intensity = intensity
+        self.setupImage(colour)
         
+    def update(self):
+        if not self.sourceSpriteGroup.sprite:
+            self.kill()
+            return
+        self.rect.center = self.sourceSpriteGroup.sprite.rect.center
+    
+    def setupImage(self, colour):
+        alpha = 3.0
+        self.image.convert_alpha()
+        self.image.fill((0,0,0,0))
+        rings = 90
+        for i in range(rings):
+            alpha += 220/rings
+            print(alpha)
+            rad = int(self.rect.width/2)-int((i*(100/rings)/100)*((self.intensity-self.sourceSpriteGroup.sprite.rect.width)/2))
+            #if rad <= self.sourceSpriteGroup.sprite.rect.width/2: break
+            pygame.draw.circle(self.image,(colour[0],colour[1],colour[2],int(alpha)),self.rect.center,rad)
+    
+    
+    '''
     def proliferate(self):
         """
         call this function on the update() of any object with a smell.
         """
         # if no source sprite then die
-        if self.sourceSprite.sprite == None: 
+        if self.sourceSpriteGroup.sprite == None: 
             self.kill(self)
             return
         
-        # find and odor of this type on the same position, or create one there
+        # find and odor of this odor_type on the same position, or create one there
         found = False
         for i in p.odors.sprites():
-            if i.type == self.type:
-                if i.pos == (self.sourceSprite.sprite.pos[0],self.sourceSprite.sprite.pos[1]):
+            if i.odor_type == self.odor_type:
+                if i.pos == (self.sourceSpriteGroup.sprite.pos[0],self.sourceSpriteGroup.sprite.pos[1]):
                     i.smellAmount = self.intensity
                     found = True
                     break
         if not found:
             # create new odor
-            Odor(self.type, self.sourceSprite.sprite.pos, self.intensity)
+            Odor(self.odor_type, self.sourceSpriteGroup.sprite.pos, self.intensity)
 
     def __str__(self):
-        return "type:{}".format(self.type)
+        return "odor_type:{}".format(self.odor_type)
+    '''
 
 '''
 print(id(OdorSource("socks")))
@@ -67,12 +89,12 @@ class Odor(Sprite):
         self.add(p.allObjects, p.odors)
         self.pos = (int(pos[0]), int(pos[1]))   # pos must be an int for the odors since they are positioned one per pixel
         self.rect.center = self.pos
-        self.type = otype
+        self.odor_type = otype
         self.smellAmount = smellAmount
         self.surroundingOdors = Group()
         # check if you have neighbours
         for i in p.odors.sprites():
-            if i.type == self.type:
+            if i.odor_type == self.odor_type:
                 if (i.pos[0] >= self.pos[0]-1 and i.pos[0] <= self.pos[0]+1) and (i.pos[1] >= self.pos[1]-1 and i.pos[1] <= self.pos[1]+1):
                     self.surroundingOdors.add(i)
                     i.surroundingOdors.add(self)
@@ -134,6 +156,6 @@ class Odor(Sprite):
                         # create new odor
                         newpos = (self.pos[0]+(i%3-1),self.pos[1]+(int(i/3)-1))
                         print("{}: found[{}]:{} newpos:{} {} {}".format(id(self),i,found[i],newpos,(i%3-1),(int(i/3)-1)))
-                        Odor(self.type, newpos, addAmount)
+                        Odor(self.odor_type, newpos, addAmount)
         else:
             self.kill(self)

@@ -38,7 +38,7 @@ class Simulation():
         """
         # update necessary things
         p.protagonist.update()
-        p.odors.update()
+#        p.odors.update()
         
         # decrease health and check for death
         pro = p.protagonist.sprite
