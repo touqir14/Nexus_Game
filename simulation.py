@@ -8,6 +8,7 @@ import parameters as p
 from protagonist import Protagonist
 import pygame
 from pygame.colordict import THECOLORS
+from antagonist import Antagonist
 
 class Simulation():
     '''
@@ -23,6 +24,7 @@ class Simulation():
         
         # create protagonist
         p.protagonist.add(Protagonist())
+        p.antagonist.add(Antagonist())
         
         # create food items
         for i in range(p.startingFood):
@@ -37,7 +39,7 @@ class Simulation():
         calling this function represents one time step of the simulation
         """
         # update necessary things
-        p.protagonist.update()
+        p.allObjects.update()
 #        p.odors.update()
         
         # decrease health and check for death

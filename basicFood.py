@@ -24,8 +24,11 @@ class BasicFood(sprite.Sprite):
         '''
         # initialize Sprite() so this instance can be updated and drawn
         sprite.Sprite.__init__(self)
+        
         # add instance to simulation list groups
         p.allObjects.add(self)
+        p.g_food.add(self)
+        
         # give this instance a rect
         self.rect = BasicFood.image.get_rect()
         self.rect.center = pos

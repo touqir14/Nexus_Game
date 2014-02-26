@@ -86,7 +86,7 @@ if __name__ == '__main__':
         
         # cover old screen with a healthy coat of grey
         env_screen.fill(p.env_bgc)
-        info_screen.fill(THECOLORS['grey10'])       # <--(might not want to erase this display every loop)
+        info_screen.fill(p.info_bgc)       # <--(might not want to erase this display every loop)
         
         # run simulation
         sim.run(env_screen)
@@ -104,8 +104,8 @@ if __name__ == '__main__':
         sim.displayStats(info_screen)
         
         # flip the screen
-        screen.blit(env_screen,(0,0))
-        screen.blit(info_screen,(0,p.resolution[1]-p.info_size[1]))
+        screen.blit(env_screen,(1,1))
+        screen.blit(info_screen,(1,p.resolution[1]-p.info_size[1]-1))
         pygame.display.flip()
                 
         # delay the simulation if it is running too fast

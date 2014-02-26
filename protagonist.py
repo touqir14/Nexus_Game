@@ -8,6 +8,7 @@ import parameters as p
 import pygame
 from movable import Movable
 from odor import OdorSource
+import math
 
 class Protagonist(Sprite, Movable):
     '''
@@ -42,10 +43,25 @@ class Protagonist(Sprite, Movable):
         self.health = p.pro_max_health
         #self.endurance = p.pro_max_endurance
         
+        # a group to hold the closest food item
+        #self.closest_food = GroupSingle()
+        
     def update(self):
         """
         put AI stuff here
         """
+        # eat food when close enough
+        for i in p.g_food.sprites():
+            x = i.rect.center[0] - self.rect.center[0]
+            y = i.rect.center[1] - self.rect.center[1]
+            food_radius = int(i.rect.width/2)
+            self_radius = int(self.rect.width/2)
+            if (math.hypot(x, y) - food_radius - self_radius) <= 0:
+                i.kill()
+                self.health += p.food_value
+                if self.health > p.pro_max_health:
+                    self.health = p.pro_max_health
+        
         """
         # endurance
         self.endurance += p.endurance_increase
