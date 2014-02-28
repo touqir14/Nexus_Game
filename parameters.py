@@ -12,33 +12,37 @@ from random import Random
 
 # setup
 resolution = (800,600)
-env_size = (resolution[0]-2,500-2)
-info_size = (resolution[0]-2,100-1)
+border = 2
+env_size = (resolution[0]-border*2,500-border*2)
+info_size = (resolution[0]-border*2,100-border)
 fps = 30
+startup = True
 
 # random object with seed
 rand = Random()
 rand.seed(12)
 
-# colours
+# screen colours
 env_bgc = THECOLORS['grey']
 info_bgc = THECOLORS['grey10']
-pro_colour = THECOLORS['red3']
-basicFoodColour = THECOLORS['forestgreen']
-
-# sizes
-basicFoodDiameter = 15
-protagonistDiameter = 20
 
 # simulation
+allObjects = sprite.Group()
 history = []
+startingFood = 10
+health_step_decrease = 0.07
+endurance_decrease = 3.0
+endurance_increase = 1.0
+
+# Protagonist
+protagonist = sprite.GroupSingle()
+protagonistDiameter = 20
 pro_starting_point = (env_size[0]-int(protagonistDiameter/2),env_size[1]-int(protagonistDiameter/2))
 pro_max_speed = 2.3
 pro_max_health = 100.0
-health_step_decrease = 0.07
 pro_max_endurance = 100.0
-endurance_decrease = 3.0
-endurance_increase = 1.0
+pro_colour = THECOLORS['red3']
+pro_odor_intensity = 450
 
 # Antagonist
 antagonist = sprite.GroupSingle()
@@ -50,12 +54,11 @@ ant_colour = THECOLORS['blue3']
 ant_odor_intensity = 450
 
 # food
-startingFood = 10
-food_value = 15
-
-allObjects = sprite.Group()
-protagonist = sprite.GroupSingle()
 g_food = sprite.Group()
+basicFoodDiameter = 15
+food_value = 15
+basicFoodColour = THECOLORS['forestgreen']
+basicFood_odor_intensity = 150
 
 # each loop of the simulation will be tracked by timeStep
 timeStep = 0
@@ -63,11 +66,11 @@ timeStep = 0
 # odors
 show_odors = False
 odorSources = sprite.Group()
-pro_odor_intensity = 450
-basicFood_odor_intensity = 150
 
 # keyboard input stuff
 up = False
 down = False
 left = False
 right = False
+
+leftMouse = False

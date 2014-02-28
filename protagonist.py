@@ -48,7 +48,6 @@ class Protagonist(Sprite, Movable):
         
     def update(self):
         """
-        put AI stuff here
         """
         # eat food when close enough
         for i in p.g_food.sprites():
@@ -61,6 +60,9 @@ class Protagonist(Sprite, Movable):
                 self.health += p.food_value
                 if self.health > p.pro_max_health:
                     self.health = p.pro_max_health
+        
+        # put AI stuff here
+        
         
         """
         # endurance

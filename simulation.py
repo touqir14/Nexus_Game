@@ -19,6 +19,10 @@ class Simulation():
         '''
         Constructor
         '''
+        # destroy previous simulation
+        for i in p.allObjects.sprites():
+            i.kill()
+        
         # zero time step
         p.timeStep = 0
         
@@ -48,6 +52,9 @@ class Simulation():
             pro.health -= p.health_step_decrease
             if pro.health <= 0:
                 pro.kill()
+        else:
+            # back to menu
+            p.startup = True
         
         # increment time step
         p.timeStep += 1
