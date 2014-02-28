@@ -27,10 +27,10 @@ class OdorSource(Sprite):
         self.setupImage(colour)
         
     def update(self):
-        if not self.sourceSpriteGrouparameters.sprite:
+        if not self.sourceSpriteGroup.sprite:
             self.kill()
             return
-        self.rect.center = self.sourceSpriteGrouparameters.sprite.rect.center
+        self.rect.center = self.sourceSpriteGroup.sprite.rect.center
     
     def setupImage(self, colour):
         alpha = 3.0

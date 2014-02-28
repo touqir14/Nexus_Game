@@ -24,6 +24,8 @@ class Simulation():
         # zero time step
         self.p.timeStep = 0
         # create protagonist
+
+        self.init_images(self.p)
         
         #self.p.protagonist.add(self.x) touqir
         # create antagonist
@@ -37,6 +39,11 @@ class Simulation():
                        self.p.rand.randint(int(self.p.basicFoodDiameter/2), self.p.env_size[1]-int(self.p.basicFoodDiameter/2)))))
             #to do: retry if food is close to previous food or object?
 
+    def init_images(self, parameters):
+        BasicFood.image = pygame.Surface((parameters.basicFoodDiameter,parameters.basicFoodDiameter))
+        BasicFood.image = BasicFood.image.convert_alpha()
+        BasicFood.image.fill((0,0,0,0))
+        pygame.draw.circle(BasicFood.image,parameters.basicFoodColour,BasicFood.image.get_rect().center,int(BasicFood.image.get_rect().width/2))
 
     def history_updater(self):
         """ records history of protagonist's game state, universal timestep, all the odour levels that the protagonist can smell, any rewards the protagonist gets"""

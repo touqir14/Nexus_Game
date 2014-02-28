@@ -15,7 +15,7 @@ import parameters as p
 #Global variable
 mode1=True
 mode2=False
-
+show_odors=False
 
 def game_mode1():
     # user controlled movement of protagonist
@@ -75,8 +75,7 @@ if __name__ == '__main__':
     env_screen = pygame.Surface(p.env_size)
     # information display surface
     info_screen = pygame.Surface(p.info_size)
-    
-    
+
     # create simulations, sim1 for mode1 and sim2 for mode2
     sim1 = Simulation()
     sim2 = Simulation()
@@ -98,7 +97,7 @@ if __name__ == '__main__':
                     pygame.quit()
                     sys.exit()
                 if e.key == K_o:
-                    p.show_odors^=True # toggle true false
+                    show_odors^=True # toggle true false
                 if e.key == K_UP:
                     p.up = True
                 if e.key == K_DOWN:
@@ -124,9 +123,13 @@ if __name__ == '__main__':
                     p.right = False
 
         if mode1:
+            if show_odors==True:sim1.p.show_odors=True
+            else: sim1.p.show_odors=False
             game_mode1()
             
         else :
+            if show_odors==True:sim2.p.show_odors=True
+            else: sim2.p.show_odors=False
             game_mode2()
             
         
