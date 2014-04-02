@@ -21,7 +21,7 @@ class Movable():
         self.speed = speed
         self.direction = (0.0,1.0)
         
-    def move(self, direction=None):
+    def move(self, direction=None, worldEdgeCheck=None, center=None):
         """
         Please only use 1, 0, or -1 for 'x' and 'y' as they will later be 
         multiplied by the objects speed.
@@ -36,22 +36,28 @@ class Movable():
             self.direction = (1.0,0.0)
         else:
             self.direction = (0.0,0.0)
-        self.moveForward()            
+        self.moveForward(worldEdgeCheck, center)            
     
-    def moveToward(self,pointB):
+    def moveToward(self,pointB, worldEdgeCheck, center):
         self.direction = unitVec(self.pos, pointB)
-        self.moveForward()
+        self.moveForward(worldEdgeCheck, center)
 
-    def moveForward(self):
-        oldpos = self.pos
+    def moveForward(self, worldEdgeCheck, center):
+        #oldpos = self.pos
         self.pos = ( self.pos[0]+self.direction[0]*self.speed, 
                      self.pos[1]+self.direction[1]*self.speed )
-        self.rect.center = self.pos
         
         # stay on the screen
-        if not pygame.Rect(0,0,p.env_size[0],p.env_size[1]).contains(self.rect):
-            self.pos = oldpos
-            self.rect.center = self.pos
+        if worldEdgeCheck != None:
+            self.pos = worldEdgeCheck(self.pos)
+
+        # place on grid using position as grid coordinate
+        if center != None:
+            self.rect.center = center(self.pos)
+
+        #if not pygame.Rect(0,0,p.env_size[0],p.env_size[1]).contains(self.rect):
+        #    self.pos = oldpos
+        #    self.rect.center = self.pos
 
 def unitVec(pointA, pointB):
     """

@@ -18,7 +18,7 @@ class Protagonist(Sprite, Movable):
     image = pygame.Surface((p.protagonistDiameter,p.protagonistDiameter))
     image.fill(p.pro_colour)
 
-    def __init__(self):
+    def __init__(self, grid):
         '''
         Constructor
         '''
@@ -37,6 +37,13 @@ class Protagonist(Sprite, Movable):
         # give position
         self.rect.center = p.pro_starting_point
         self.pos = (float(self.rect.center[0]),float(self.rect.center[1]))
+        
+        # make sure that position is on grid world
+        self.pos = grid.closestGridCoord(self.pos)
+        
+        # centre rect over grid coord
+        self.rect.center = grid.blockdict[self.pos].sprite.rect.center
+        
         # give this instance an odor so it has a smell in the environment
         OdorSource(__name__,GroupSingle(self),p.pro_odor_intensity,p.pro_colour)
         # give health and endurance
@@ -46,7 +53,7 @@ class Protagonist(Sprite, Movable):
         # a group to hold the closest food item
         #self.closest_food = GroupSingle()
         
-    def update(self):
+    def update(self, grid):
         """
         """
         # eat food when close enough
@@ -74,9 +81,4 @@ class Protagonist(Sprite, Movable):
         self.speed = p.pro_max_speed * endurancePercent
         """
     
-    def move(self, direction=None):
-        Movable.move(self, direction=direction)
-        #self.endurance -= p.endurance_decrease
-        #if self.endurance <= 0:
-        #    self.endurance = 0.0
         

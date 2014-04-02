@@ -11,6 +11,7 @@ import parameters as p
 from simulation import Simulation
 from basicFood import BasicFood
 from introPage import IntroPage
+from gridworld import GridWorld
 
 def imageSetup():
     """ 
@@ -34,6 +35,13 @@ if __name__ == '__main__':
     env_screen = pygame.Surface(p.env_size)
     # information display surface
     info_screen = pygame.Surface(p.info_size)
+    
+    # init components
+    Gunit = 30
+    Gwidth = 26
+    Gheight = 16
+    grid = pygame.sprite.GroupSingle()
+    grid.add(GridWorld(Gunit, Gwidth, Gheight))
     
     # other housekeeping (some image setup needs to go after 'pygame.init()')
     imageSetup()
@@ -87,20 +95,21 @@ if __name__ == '__main__':
 
         # user controlled movement of protagonist
         pro = p.protagonist.sprite
-        if pro:
+        grd = grid.sprite
+        if pro and grd:
             if p.up == True:
-                pro.move('up')
+                pro.move('up', grd.closestGridCoord, grd.getcenter)
             if p.down == True:
-                pro.move('down')
+                pro.move('down', grd.closestGridCoord, grd.getcenter)
             if p.left == True:
-                pro.move('left')
+                pro.move('left', grd.closestGridCoord, grd.getcenter)
             if p.right == True:
-                pro.move('right')
+                pro.move('right', grd.closestGridCoord, grd.getcenter)
                 
         if p.startup:
             #iPage.update(pygame.mouse.get_pos())
             # create a new simulation
-            sim = iPage.generateSim(pygame.mouse.get_pos())
+            sim = iPage.generateSim(pygame.mouse.get_pos(), grid.sprite)
             if sim != None:
                 p.startup = False
                 
@@ -110,9 +119,11 @@ if __name__ == '__main__':
             # cover old screen with a healthy coat of [background colour]
             env_screen.fill(p.env_bgc)
             info_screen.fill(p.info_bgc)
+            grid.update()
+            grid.draw(env_screen)
             
             # run simulation
-            sim.run(env_screen)
+            sim.run(env_screen, grid.sprite)
             
             # proliferate odors
             if p.show_odors: p.odorSources.update()

@@ -15,7 +15,7 @@ class Simulation():
     classdocs
     '''
 
-    def __init__(self):
+    def __init__(self, grid):
         '''
         Constructor
         '''
@@ -27,7 +27,7 @@ class Simulation():
         p.timeStep = 0
         
         # create protagonist
-        p.protagonist.add(Protagonist())
+        p.protagonist.add(Protagonist(grid))
         p.antagonist.add(Antagonist())
         
         # create food items
@@ -38,12 +38,12 @@ class Simulation():
 
         # create antagonist
 
-    def run(self, env_screen):
+    def run(self, env_screen, grid):
         """
         calling this function represents one time step of the simulation
         """
         # update necessary things
-        p.allObjects.update()
+        p.allObjects.update(grid)
 #        p.odors.update()
         
         # decrease health and check for death
