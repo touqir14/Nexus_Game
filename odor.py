@@ -39,6 +39,7 @@ class OdorSource(Sprite):
         rings = 90
         for i in range(rings):
             alpha += 220/rings
+            print(alpha)
             rad = int(self.rect.width/2)-int((i*(100/rings)/100)*((self.intensity-self.sourceSpriteGroup.sprite.rect.width)/2))
             #if rad <= self.sourceSpriteGroup.sprite.rect.width/2: break
             pygame.draw.circle(self.image,(colour[0],colour[1],colour[2],int(alpha)),self.rect.center,rad)
@@ -78,7 +79,6 @@ print(OdorSource("dirt"))
 print(OdorSource("watermelon"))
 '''
 
-"""
 class Odor(Sprite):
     def __init__(self, otype, pos, smellAmount):
         # required by Sprite
@@ -155,8 +155,7 @@ class Odor(Sprite):
                     if found[i] == False:
                         # create new odor
                         newpos = (self.pos[0]+(i%3-1),self.pos[1]+(int(i/3)-1))
-                        #print("{}: found[{}]:{} newpos:{} {} {}".format(id(self),i,found[i],newpos,(i%3-1),(int(i/3)-1)))
+                        print("{}: found[{}]:{} newpos:{} {} {}".format(id(self),i,found[i],newpos,(i%3-1),(int(i/3)-1)))
                         Odor(self.odor_type, newpos, addAmount)
         else:
             self.kill(self)
-"""

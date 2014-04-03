@@ -8,18 +8,17 @@ Run the program from this main file.
 import os, sys, pygame
 from pygame.locals import *
 import parameters as p
+from pygame.colordict import THECOLORS
 from simulation import Simulation
 from basicFood import BasicFood
+<<<<<<< HEAD
 from introPage import IntroPage
 from gridworld import GridWorld
+=======
+>>>>>>> parent of 3817c33... menu and border condition
 
 def imageSetup():
-    """ 
-    Should find another way to do this. But for now, 
-    this allows the images to be set up after calling 'pygame.init()'
-    rather than from within each class that has an image (where 
-    'pygame.init()' is not called)
-    """
+    """ Should find another way to do this """
     BasicFood.image = BasicFood.image.convert_alpha()
     BasicFood.image.fill((0,0,0,0))
     pygame.draw.circle(BasicFood.image,p.basicFoodColour,BasicFood.image.get_rect().center,int(BasicFood.image.get_rect().width/2))
@@ -46,8 +45,8 @@ if __name__ == '__main__':
     # other housekeeping (some image setup needs to go after 'pygame.init()')
     imageSetup()
     
-    #
-    iPage = IntroPage()
+    # create a new simulation
+    sim = Simulation()
     
     # create a clock to time the simulation
     clock = pygame.time.Clock()
@@ -60,19 +59,11 @@ if __name__ == '__main__':
                 # safely exit the system
                 pygame.quit()
                 sys.exit()
-            if e.type == MOUSEBUTTONDOWN:
-                p.leftMouse = True
-            if e.type == MOUSEBUTTONUP:
-                p.leftMouse = False
             if e.type == KEYDOWN:
                 if e.key == K_ESCAPE:
-                    if p.startup:
-                        # safely exit the system
-                        pygame.quit()
-                        sys.exit()
-                    else:
-                        # back to menu
-                        p.startup = True
+                    # safely exit the system
+                    pygame.quit()
+                    sys.exit()
                 if e.key == K_o:
                     p.show_odors^=True # toggle true false
                 if e.key == K_UP:
@@ -104,6 +95,7 @@ if __name__ == '__main__':
             if p.left == True:
                 pro.move('left', grd.closestGridCoord, grd.getcenter)
             if p.right == True:
+<<<<<<< HEAD
                 pro.move('right', grd.closestGridCoord, grd.getcenter)
                 
         if p.startup:
@@ -140,6 +132,32 @@ if __name__ == '__main__':
             # flip the screen
             screen.blit(env_screen,(p.border,p.border))
             screen.blit(info_screen,(p.border,p.resolution[1]-p.info_size[1]-p.border))
+=======
+                pro.move('right')
+        
+        # cover old screen with a healthy coat of grey
+        env_screen.fill(p.env_bgc)
+        info_screen.fill(p.info_bgc)       # <--(might not want to erase this display every loop)
+        
+        # run simulation
+        sim.run(env_screen)
+        
+        # proliferate odors
+        if p.show_odors: p.odorSources.update()
+        #for i in p.odorSources:
+        #    i.proliferate()
+        
+        # draw the environment
+        p.allObjects.draw(env_screen)
+        if p.show_odors: p.odorSources.draw(env_screen)
+        
+        # show the numbers and life bars
+        sim.displayStats(info_screen)
+        
+        # flip the screen
+        screen.blit(env_screen,(1,1))
+        screen.blit(info_screen,(1,p.resolution[1]-p.info_size[1]-1))
+>>>>>>> parent of 3817c33... menu and border condition
         pygame.display.flip()
                 
         # delay the simulation if it is running too fast

@@ -53,17 +53,17 @@ class Antagonist(Sprite, Movable):
         """
         put AI stuff here
         """
+        print("im here")
         # eat protagonist when close enough
         pro = p.protagonist.sprite
-        if pro:
-            x = pro.rect.center[0] - self.rect.center[0]
-            y = pro.rect.center[1] - self.rect.center[1]
-            pro_radius = int(pro.rect.width/2)
-            self_radius = int(self.rect.width/2)
-            if (math.hypot(x, y) - pro_radius - self_radius) <= 0:
-                pro.kill()
-                self.health += p.food_value
-                if self.health > p.ant_max_health:
-                    self.health = p.ant_max_health
+        x = pro.rect.center[0] - self.rect.center[0]
+        y = pro.rect.center[1] - self.rect.center[1]
+        pro_radius = int(pro.rect.width/2)
+        self_radius = int(self.rect.width/2)
+        if (math.hypot(x, y) - pro_radius - self_radius) <= 0:
+            pro.kill()
+            self.health += p.food_value
+            if self.health > p.ant_max_health:
+                self.health = p.ant_max_health
 
         
