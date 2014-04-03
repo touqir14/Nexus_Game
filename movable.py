@@ -41,6 +41,7 @@ class Movable():
         self.moveForward(worldEdgeCheck, center)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     def moveForward(self, worldEdgeCheck, center):
         #oldpos = self.pos
         self.pos = ( self.pos[0]+self.direction[0]*self.speed, 
@@ -57,6 +58,12 @@ class Movable():
         #if not pygame.Rect(0,0,p.env_size[0],p.env_size[1]).contains(self.rect):
         #    self.pos = oldpos
         #    self.rect.center = self.pos
+=======
+    def moveForward(self):
+        self.pos = ( self.pos[0]+self.direction[0]*self.speed, 
+                     self.pos[1]+self.direction[1]*self.speed )
+        self.rect.center = self.pos
+>>>>>>> parent of 3817c33... menu and border condition
 =======
     def moveForward(self):
         self.pos = ( self.pos[0]+self.direction[0]*self.speed, 
