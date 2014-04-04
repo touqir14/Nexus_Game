@@ -33,8 +33,8 @@ class GridWorld(pygame.sprite.Sprite):
         Constructor
         '''
         self.gunit = Gunit
-        self.gwidth = Gwidth
-        self.gheight = Gheight
+        self.width = Gwidth
+        self.height = Gheight
         
         # sprite needs: init, image, rect
         super().__init__()
@@ -46,10 +46,16 @@ class GridWorld(pygame.sprite.Sprite):
         boarderColour = (200,200,30)
         pygame.draw.rect(self.image,boarderColour,self.rect,1)
         
+        # clear old blocks (do this somewhere else please)
+        for b in GridWorld.g_Blocks.sprites():
+            b.kill()
+        
         # create blocks
         self.blockdict = {}
+        self.itemsdict = {}
         for y in range(Gheight):
             for x in range(Gwidth):
+                self.itemsdict[(x,y)] = pygame.sprite.Group()
                 self.blockdict[(x,y)] = pygame.sprite.GroupSingle()
                 self.blockdict[(x,y)].add(Block(Gunit, (x*self.gunit,y*self.gunit), boarderColour))
                 GridWorld.g_Blocks.add(self.blockdict[(x,y)].sprite)
@@ -63,6 +69,18 @@ class GridWorld(pygame.sprite.Sprite):
         for s in GridWorld.g_Blocks.sprites():
             s.rect.left += xoffset
             s.rect.bottom += yoffset
+    
+    def istile(self, coord):
+        """
+        check if tile exists.
+        """
+        return coord in self.itemsdict.keys()
+    
+    def freetiles(self):
+        """
+        return a list of the tiles that have nothing on them
+        """
+        return [k for k,v in self.itemsdict.items() if len(v.sprites()) == 0]
         
     def update(self):
         # update / draw blocks
@@ -70,8 +88,8 @@ class GridWorld(pygame.sprite.Sprite):
         #GridWorld.g_Blocks.draw(self.image)
         '''
         u = self.gunit
-        for y in range(self.gheight):
-            for x in range(self.gwidth):
+        for y in range(self.height):
+            for x in range(self.width):
                 pygame.draw.rect(self.image,(200,10,10),((x*u,y*u),(u+1,u+1)),1)
         '''
         
@@ -85,7 +103,13 @@ class GridWorld(pygame.sprite.Sprite):
         pygame.sprite.Sprite.kill(self)
         
     def getcenter(self, coord):
-        return self.blockdict[coord].sprite.rect.center
+        """
+        return the x,y position of the center of the tile at 'coord'
+        return None if not a tile (can be used for edge of world detection
+        """
+        if self.istile(coord):
+            return self.blockdict[coord].sprite.rect.center
+        return None
     
     def convPosToCoord(self, screenpos):
         return (screenpos[0]/self.gunit, screenpos[1]/self.gunit)
@@ -97,10 +121,19 @@ class GridWorld(pygame.sprite.Sprite):
         x,y = gridcoord
         if x < 0:
             x = 0
-        elif x >= self.gwidth:
-            x = self.gwidth - 1
+        elif x >= self.width:
+            x = self.width - 1
         if y < 0:
             y = 0
-        elif y >= self.gheight:
-            y = self.gheight - 1
+        elif y >= self.height:
+            y = self.height - 1
         return (x,y)
+    
+    def edgecondition(self, coord):
+        """
+        game objects moving around on the screen can use this function to 
+        make sure they stay on the grid. 
+        - takes a grid coordinate to check
+        - returns a valid coordinate (possibly the same)
+        """
+        return self.closestGridCoord(coord)

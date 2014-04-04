@@ -22,6 +22,9 @@ class Movable(BaseEnviroObj):
         super().__init__(image, envirogrid, startcoord)
         self.speed = speed
         self.direction = (0.0,1.0)
+        self.edgecheck = envirogrid.edgecondition
+        self.pos = envirogrid.getcenter #convCoordToPos
+        self.validcoord = envirogrid.istile
         
     def move(self, direction=None):
         """
@@ -45,15 +48,25 @@ class Movable(BaseEnviroObj):
         self.moveForward()
 
     def moveForward(self):
-        oldcoord = self.coord
-        self.coord = ( self.coord[0]+self.direction[0]*self.speed, 
+#        oldcoord = self.coord
+        newcoord = ( self.coord[0]+self.direction[0]*self.speed, 
                      self.coord[1]+self.direction[1]*self.speed )
-        self.rect.center = self.coord
         
         # stay on the screen
-        if not pygame.Rect(0,0,p.env_size[0],p.env_size[1]).contains(self.rect):
-            self.coord = oldcoord
-            self.rect.center = self.coord
+        newcoord = self.edgecheck(newcoord)
+        #if self.validcoord(newcoord):
+        self.coord = newcoord
+        # place rect on tile position
+        newpos = self.pos(self.coord)
+        if newpos:
+            self.rect.center = newpos
+        else:
+            print("invalid position for protagonist")
+        
+        # stay on the screen
+        #if not pygame.Rect(0,0,p.env_size[0],p.env_size[1]).contains(self.rect):
+        #    self.coord = oldcoord
+        #    self.rect.center = self.place(self.coord)
 
 def unitVec(pointA, pointB):
     """

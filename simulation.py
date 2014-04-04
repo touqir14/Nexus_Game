@@ -37,9 +37,10 @@ class Simulation():
         p.antagonist.add(Antagonist(envirogrid))
         
         # create food items
-        for i in range(p.startingFood):
-            BasicFood((p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[0]-int(p.basicFoodDiameter/2)),
-                       p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[1]-int(p.basicFoodDiameter/2))))
+        self.generatefood(p.startingFood,envirogrid)
+        #for i in range(p.startingFood):
+        #    BasicFood((p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[0]-int(p.basicFoodDiameter/2)),
+        #               p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[1]-int(p.basicFoodDiameter/2))))
             #to do: retry if food is close to previous food or object?
 
         # create antagonist
@@ -115,6 +116,19 @@ class Simulation():
 
         screen.blit(proEnduranceBar,(9,34))
         '''
+    
+    def generatefood(self, amount, grid):
+        """
+        place food on environment grid in such a way that no more than one food is placed per tile
+        """
+        possiblecoords = grid.freetiles()#[(x,y) for x in range(grid.width) for y in range(grid.height)]
+        # at this point the hero's coordinate should be removed from the list
+        #possiblecoords = possiblecoords[:-1]
+        for n in range(amount):
+            if len(possiblecoords) <= 0: break # no more room for foods
+            coord = p.rand.choice(possiblecoords)
+            BasicFood(grid, coord)#(p.rand.randint(0, gridwidth-1),p.rand.randint(0, gridwidth-1)))
+            possiblecoords.remove(coord)
 
 def drawText(text, screen, pos, size=15, colour=(200,255,200)):
     """
