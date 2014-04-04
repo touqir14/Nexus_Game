@@ -22,7 +22,16 @@ class Block(pygame.sprite.Sprite):
         #drawrect = pygame.Rect((0,0),self.rect.size)
         pass
 
-
+def floorCoord(coordfunc):
+    """
+    to be used as a wrapper.
+    *** anytime the grid's dict needs to be accessed ***
+    since screen objects can store their coordinates as float due to
+    differences in movement speed, this wrapper will make sure that
+    any function that takes coords will receive the INT coords.
+    lambda(self,coord):...
+    """
+    return lambda s,co: coordfunc(s,(math.floor(co[0]),math.floor(co[1])))
 
 class GridWorld(pygame.sprite.Sprite):
     #g_Grid = pygame.sprite.GroupSingle()
@@ -70,6 +79,7 @@ class GridWorld(pygame.sprite.Sprite):
             s.rect.left += xoffset
             s.rect.bottom += yoffset
     
+    @floorCoord
     def istile(self, coord):
         """
         check if tile exists.
@@ -102,11 +112,14 @@ class GridWorld(pygame.sprite.Sprite):
             b.kill()
         pygame.sprite.Sprite.kill(self)
         
+    @floorCoord
     def getcenter(self, coord):
         """
         return the x,y position of the center of the tile at 'coord'
-        return None if not a tile (can be used for edge of world detection
+        return None if not a tile (can be used for edge of world 
+        detection but there's a better way to do that)
         """
+        #floorcoord = (math.floor(coord[0]),math.floor(coord[1]))
         if self.istile(coord):
             return self.blockdict[coord].sprite.rect.center
         return None
@@ -114,6 +127,7 @@ class GridWorld(pygame.sprite.Sprite):
     def convPosToCoord(self, screenpos):
         return (screenpos[0]/self.gunit, screenpos[1]/self.gunit)
     
+    @floorCoord
     def convCoordToPos(self, gridcoord):
         return (math.floor(gridcoord[0])*self.gunit, math.floor(gridcoord[1])*self.gunit)
     

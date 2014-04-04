@@ -24,7 +24,6 @@ class Movable(BaseEnviroObj):
         self.direction = (0.0,1.0)
         self.edgecheck = envirogrid.edgecondition
         self.pos = envirogrid.getcenter #convCoordToPos
-        self.validcoord = envirogrid.istile
         
     def move(self, direction=None):
         """
@@ -53,10 +52,9 @@ class Movable(BaseEnviroObj):
                      self.coord[1]+self.direction[1]*self.speed )
         
         # stay on the screen
-        newcoord = self.edgecheck(newcoord)
-        #if self.validcoord(newcoord):
-        self.coord = newcoord
-        # place rect on tile position
+        self.coord = self.edgecheck(newcoord)
+        
+        # place rect on correct tile position
         newpos = self.pos(self.coord)
         if newpos:
             self.rect.center = newpos
