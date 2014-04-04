@@ -19,11 +19,11 @@ class IntroPage():
         self.opt1_rect = pygame.Rect(int((p.resolution[0]-200)/2),int((p.resolution[1]-30)/2),200,30)
         self.opt1_highlight = 0
         
-    def generateSim(self, mpos):
+    def generateSim(self, mpos, env_rect, gridunit, gridwidth, gridheight):
         if self.opt1_rect.collidepoint(mpos):
             self.opt1_highlight = 20
             if p.leftMouse:
-                return simulation.Simulation()
+                return simulation.Simulation(env_rect, gridunit, gridwidth, gridheight)
         else:
             self.opt1_highlight = 0
         

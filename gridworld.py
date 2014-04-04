@@ -28,7 +28,7 @@ class GridWorld(pygame.sprite.Sprite):
     #g_Grid = pygame.sprite.GroupSingle()
     g_Blocks = pygame.sprite.Group()
 
-    def __init__(self, Gunit, Gwidth, Gheight):
+    def __init__(self, env_rect, Gunit, Gwidth, Gheight):
         '''
         Constructor
         '''
@@ -54,10 +54,20 @@ class GridWorld(pygame.sprite.Sprite):
                 self.blockdict[(x,y)].add(Block(Gunit, (x*self.gunit,y*self.gunit), boarderColour))
                 GridWorld.g_Blocks.add(self.blockdict[(x,y)].sprite)
         
+        GridWorld.g_Blocks.draw(self.image)
+        
+        # move rects by offset amount (grid is centered on screen)
+        xoffset = (env_rect.width - self.rect.width)//2
+        yoffset = (env_rect.height - self.rect.height)//2
+        self.rect.topleft = (xoffset, yoffset)
+        for s in GridWorld.g_Blocks.sprites():
+            s.rect.left += xoffset
+            s.rect.bottom += yoffset
+        
     def update(self):
         # update / draw blocks
         #GridWorld.g_Blocks.update()
-        GridWorld.g_Blocks.draw(self.image)
+        #GridWorld.g_Blocks.draw(self.image)
         '''
         u = self.gunit
         for y in range(self.gheight):
@@ -77,10 +87,10 @@ class GridWorld(pygame.sprite.Sprite):
     def getcenter(self, coord):
         return self.blockdict[coord].sprite.rect.center
     
-    def convScreenToGrid(self, screenpos):
+    def convPosToCoord(self, screenpos):
         return (screenpos[0]/self.gunit, screenpos[1]/self.gunit)
     
-    def convGridToScreen(self, gridcoord):
+    def convCoordToPos(self, gridcoord):
         return (math.floor(gridcoord[0])*self.gunit, math.floor(gridcoord[1])*self.gunit)
     
     def closestGridCoord(self, gridcoord):

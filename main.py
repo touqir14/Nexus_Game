@@ -100,7 +100,8 @@ if __name__ == '__main__':
         if p.startup:
             #iPage.update(pygame.mouse.get_pos())
             # create a new simulation
-            sim = iPage.generateSim(pygame.mouse.get_pos())
+            env_rect = env_screen.get_rect()
+            sim = iPage.generateSim(pygame.mouse.get_pos(), env_rect, gridunit=30, gridwidth=26, gridheight=16)
             if sim != None:
                 p.startup = False
                 
@@ -120,6 +121,7 @@ if __name__ == '__main__':
             #    i.proliferate()
             
             # draw the environment
+            sim.drawWorld(env_screen)
             p.allObjects.draw(env_screen)
             if p.show_odors: p.odorSources.draw(env_screen)
             

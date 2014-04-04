@@ -10,7 +10,7 @@ from movable import Movable
 from odor import OdorSource
 import math
 
-class Antagonist(Sprite, Movable):
+class Antagonist(Movable):
     '''
     classdocs
     '''
@@ -18,26 +18,27 @@ class Antagonist(Sprite, Movable):
     image = pygame.Surface((p.ant_diameter,p.ant_diameter))
     image.fill(p.ant_colour)
 
-    def __init__(self):
+    def __init__(self, envirogrid):
         '''
         Constructor
         '''
+        super().__init__(p.pro_max_speed, envirogrid, Antagonist.image)
         ## required by Sprite()
         # initialize Sprite() so this instance can be updated and drawn
-        Sprite.__init__(self)
+        #Sprite.__init__(self)
         # give antagonist a rect
-        self.rect = Antagonist.image.get_rect()
+        #self.rect = Antagonist.image.get_rect()
         
         ## required by Movable()
-        Movable.__init__(self, p.ant_max_speed)
+        #Movable.__init__(self, p.ant_max_speed)
         
         # add instance to simulation list groups and control group
         p.allObjects.add(self)
         p.antagonist.add(self)
         
         # give position
-        self.rect.center = p.ant_starting_point
-        self.pos = (float(self.rect.center[0]),float(self.rect.center[1]))
+        #self.rect.center = p.ant_starting_point
+        #self.pos = (float(self.rect.center[0]),float(self.rect.center[1]))
         
         # give this instance an odor so it has a smell in the environment
         OdorSource(__name__,GroupSingle(self),p.ant_odor_intensity,p.ant_colour)

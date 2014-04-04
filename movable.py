@@ -6,18 +6,20 @@ Created on 2014-02-19
 import math
 import pygame
 import parameters as p
+from baseEnviroObj import BaseEnviroObj
 
-class Movable():
+class Movable(BaseEnviroObj):
     '''
     This class adds motion capability to screen objects like the protagonist.
     object must have a float position called 'pos' and a pygame rect called 'rect'
     '''
 
 
-    def __init__(self, speed):
+    def __init__(self, speed, envirogrid, image, startcoord=(0,0)):
         '''
         Call this init to give these variables to the new instance
         '''
+        super().__init__(image, envirogrid, startcoord)
         self.speed = speed
         self.direction = (0.0,1.0)
         
@@ -39,19 +41,19 @@ class Movable():
         self.moveForward()            
     
     def moveToward(self,pointB):
-        self.direction = unitVec(self.pos, pointB)
+        self.direction = unitVec(self.coord, pointB)
         self.moveForward()
 
     def moveForward(self):
-        oldpos = self.pos
-        self.pos = ( self.pos[0]+self.direction[0]*self.speed, 
-                     self.pos[1]+self.direction[1]*self.speed )
-        self.rect.center = self.pos
+        oldcoord = self.coord
+        self.coord = ( self.coord[0]+self.direction[0]*self.speed, 
+                     self.coord[1]+self.direction[1]*self.speed )
+        self.rect.center = self.coord
         
         # stay on the screen
         if not pygame.Rect(0,0,p.env_size[0],p.env_size[1]).contains(self.rect):
-            self.pos = oldpos
-            self.rect.center = self.pos
+            self.coord = oldcoord
+            self.rect.center = self.coord
 
 def unitVec(pointA, pointB):
     """

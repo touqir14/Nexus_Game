@@ -9,13 +9,14 @@ from protagonist import Protagonist
 import pygame
 from pygame.colordict import THECOLORS
 from antagonist import Antagonist
+from gridworld import GridWorld
 
 class Simulation():
     '''
     classdocs
     '''
 
-    def __init__(self):
+    def __init__(self, env_rect, gridunit, gridwidth, gridheight):
         '''
         Constructor
         '''
@@ -26,9 +27,14 @@ class Simulation():
         # zero time step
         p.timeStep = 0
         
+        # create environment
+        envirogrid = GridWorld(env_rect, gridunit, gridwidth, gridheight)
+        self.grid = pygame.sprite.GroupSingle()
+        self.grid.add(envirogrid)
+        
         # create protagonist
-        p.protagonist.add(Protagonist())
-        p.antagonist.add(Antagonist())
+        p.protagonist.add(Protagonist(envirogrid))
+        p.antagonist.add(Antagonist(envirogrid))
         
         # create food items
         for i in range(p.startingFood):
@@ -42,6 +48,9 @@ class Simulation():
         """
         calling this function represents one time step of the simulation
         """
+        # centre grid on screen
+        #self.grid.sprite.rect.center = env_screen.get_rect().center
+        
         # update necessary things
         p.allObjects.update()
 #        p.odors.update()
@@ -58,6 +67,9 @@ class Simulation():
         
         # increment time step
         p.timeStep += 1
+    
+    def drawWorld(self, screen):
+        self.grid.draw(screen)
     
     def displayStats(self, screen):
         ## protagonist health bar

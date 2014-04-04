@@ -10,7 +10,7 @@ from movable import Movable
 from odor import OdorSource
 import math
 
-class Protagonist(Sprite, Movable):
+class Protagonist(Movable):
     '''
     classdocs
     '''
@@ -18,25 +18,28 @@ class Protagonist(Sprite, Movable):
     image = pygame.Surface((p.protagonistDiameter,p.protagonistDiameter))
     image.fill(p.pro_colour)
 
-    def __init__(self):
+    def __init__(self, envirogrid):
         '''
         Constructor
         '''
+        super().__init__(p.pro_max_speed, envirogrid, Protagonist.image, (99,99))
         ## required by Sprite()
         # initialize Sprite() so this instance can be updated and drawn
-        Sprite.__init__(self)
+        #Sprite.__init__(self)
         # give protagonist a rect
-        self.rect = Protagonist.image.get_rect()
+        #self.rect = Protagonist.image.get_rect()
         
         ## required by Movable()
-        Movable.__init__(self, p.pro_max_speed)
+        #Movable.__init__(self, p.pro_max_speed)
         
         # add instance to simulation list groups and control group
         p.allObjects.add(self)
         p.protagonist.add(self)
-        # give position
-        self.rect.center = p.pro_starting_point
-        self.pos = (float(self.rect.center[0]),float(self.rect.center[1]))
+        
+        
+        #self.coord = (float(self.rect.center[0]),float(self.rect.center[1]))
+
+        
         # give this instance an odor so it has a smell in the environment
         OdorSource(__name__,GroupSingle(self),p.pro_odor_intensity,p.pro_colour)
         # give health and endurance
