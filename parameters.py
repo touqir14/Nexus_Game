@@ -29,7 +29,7 @@ info_bgc = THECOLORS['grey10']
 # simulation
 allObjects = sprite.Group()
 history = []
-startingFood = 10
+startingFood = 100
 health_step_decrease = 0.07
 endurance_decrease = 3.0
 endurance_increase = 1.0

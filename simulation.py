@@ -10,6 +10,7 @@ import pygame
 from pygame.colordict import THECOLORS
 from antagonist import Antagonist
 from gridworld import GridWorld
+import knn
 
 class Simulation():
     '''
@@ -34,16 +35,20 @@ class Simulation():
         
         # create protagonist
         p.protagonist.add(Protagonist(envirogrid))
-        p.antagonist.add(Antagonist(envirogrid))
+        ant_coord = (5,3)
+        p.antagonist.add(Antagonist(envirogrid, ant_coord))
+        #adjust valuedict for antagonist
+        envirogrid.value_dict[ant_coord].append(Antagonist.value)
         
         # create food items
-        self.generatefood(p.startingFood,envirogrid)
+        self.generatefood(amount=20,grid=envirogrid)
         #for i in range(p.startingFood):
         #    BasicFood((p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[0]-int(p.basicFoodDiameter/2)),
         #               p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[1]-int(p.basicFoodDiameter/2))))
             #to do: retry if food is close to previous food or object?
 
-        # create antagonist
+        self.knndict = knn.k_nearest_neighbour(envirogrid.value_dict, 4, (envirogrid.width-1,envirogrid.height-1))
+        
 
     def run(self, env_screen):
         """
@@ -93,6 +98,9 @@ class Simulation():
             proHealthBar.blit(front,(1,1))
 
         screen.blit(proHealthBar,(9,9))
+        
+        # knn info
+        drawText("KNN target tile:",screen,(10,50))
 
         '''
         ## protagonist endurance bar
@@ -121,12 +129,13 @@ class Simulation():
         """
         place food on environment grid in such a way that no more than one food is placed per tile
         """
-        possiblecoords = grid.freetiles()#[(x,y) for x in range(grid.width) for y in range(grid.height)]
+        possiblecoords = grid.emptytiles()#[(x,y) for x in range(grid.width) for y in range(grid.height)]
         # at this point the hero's coordinate should be removed from the list
         #possiblecoords = possiblecoords[:-1]
         for n in range(amount):
             if len(possiblecoords) <= 0: break # no more room for foods
             coord = p.rand.choice(possiblecoords)
+            grid.value_dict[coord].append(BasicFood.value)
             BasicFood(grid, coord)#(p.rand.randint(0, gridwidth-1),p.rand.randint(0, gridwidth-1)))
             possiblecoords.remove(coord)
 

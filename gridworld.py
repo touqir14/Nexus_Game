@@ -60,10 +60,12 @@ class GridWorld(pygame.sprite.Sprite):
             b.kill()
         
         # create blocks
+        self.value_dict = {}
         self.blockdict = {}
         self.itemsdict = {}
-        for y in range(Gheight):
-            for x in range(Gwidth):
+        for y in range(self.height):
+            for x in range(self.width):
+                self.value_dict[(x,y)] = []
                 self.itemsdict[(x,y)] = pygame.sprite.Group()
                 self.blockdict[(x,y)] = pygame.sprite.GroupSingle()
                 self.blockdict[(x,y)].add(Block(Gunit, (x*self.gunit,y*self.gunit), boarderColour))
@@ -86,7 +88,7 @@ class GridWorld(pygame.sprite.Sprite):
         """
         return coord in self.itemsdict.keys()
     
-    def freetiles(self):
+    def emptytiles(self):
         """
         return a list of the tiles that have nothing on them
         """

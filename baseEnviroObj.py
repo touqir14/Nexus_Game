@@ -24,5 +24,5 @@ class BaseEnviroObj(pygame.sprite.Sprite):
         self.coord = envirogrid.closestGridCoord(startcoord)
         #self.coord = startcoord
         self.rect.center = envirogrid.getcenter(self.coord)
-        
+                
     

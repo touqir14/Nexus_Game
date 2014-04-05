@@ -17,12 +17,16 @@ class Antagonist(Movable):
     # give the antagonist an image
     image = pygame.Surface((p.ant_diameter,p.ant_diameter))
     image.fill(p.ant_colour)
+    
+    # a value is given to all environment object classes that tell them if the hero likes them or not
+    # 0 means not...
+    value = 0
 
-    def __init__(self, envirogrid):
+    def __init__(self, envirogrid, startcoord):
         '''
         Constructor
         '''
-        super().__init__(p.pro_max_speed, envirogrid, Antagonist.image)
+        super().__init__(p.pro_max_speed, envirogrid, Antagonist.image, startcoord)
         ## required by Sprite()
         # initialize Sprite() so this instance can be updated and drawn
         #Sprite.__init__(self)

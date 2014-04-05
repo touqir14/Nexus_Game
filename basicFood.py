@@ -19,6 +19,9 @@ class BasicFood(BaseEnviroObj):
     # one image for all the food instances
     image = pygame.Surface((p.basicFoodDiameter,p.basicFoodDiameter))
 
+    # set food value to positive
+    value = 1
+        
     def __init__(self, envirogrid, startcoord=(0,0)):
         '''
         Constructor
