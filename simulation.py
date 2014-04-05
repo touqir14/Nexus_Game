@@ -35,7 +35,7 @@ class Simulation():
         
         # create protagonist
         p.protagonist.add(Protagonist(envirogrid))
-        ant_coord = (5,3)
+        ant_coord = (0,0)
         p.antagonist.add(Antagonist(envirogrid, ant_coord))
         #adjust valuedict for antagonist
         envirogrid.value_dict[ant_coord].append(Antagonist.value)

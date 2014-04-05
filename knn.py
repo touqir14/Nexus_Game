@@ -133,6 +133,7 @@ def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
     spoints=[]
     KNN_weights={}
 
+    print(list(keys).sort())
     for key in keys: 
         print('key {}'.format(key))
         if len(KNN[key])>k: #In case our KNN has more points than kpoints and we need to create fake samples
@@ -200,7 +201,7 @@ def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
                 if len(negative) > 0:
                     _dict[0]=negative
                 temp=weight_assigner(_dict,list(_dict.keys()))
-                print('temp {}'.format(key))
+                print('temp {}'.format(temp))
                 KNN[key].append([temp])
 
     return KNN
@@ -313,6 +314,7 @@ def k_nearest_neighbour(grid_dictionary,k,size,gamma=0.9,flag=1):
             present_k+=len(k_points)
         
         KNN[tuple(box)]=k_points
+    print('nineteenfour {}'.format(KNN[(19,4)]))
     if flag==0:
 
         KNN=Probabilistic_KNN(k,KNN,grid_dictionary,gamma,0)
