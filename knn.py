@@ -134,8 +134,9 @@ def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
     KNN_weights={}
 
     for key in keys: 
-        # print(len(KNN[key]))
+        print('key {}'.format(key))
         if len(KNN[key])>k: #In case our KNN has more points than kpoints and we need to create fake samples
+            print('hellow worlde {}'.format('okey'))
             distance=KNN[key][-1][0]
             index=-1
             for i in KNN[key]:
@@ -183,6 +184,7 @@ def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
         if len(KNN[key])<=k:
 
             for i in KNN[key]:
+                print("iiiieeee {}".format(i))
                 if point_dictionary[tuple(i[1])]==[1]:
                     positive.append(i[0])
                 if point_dictionary[tuple(i[1])]==[0]:
@@ -198,6 +200,7 @@ def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
                 if len(negative) > 0:
                     _dict[0]=negative
                 temp=weight_assigner(_dict,list(_dict.keys()))
+                print('temp {}'.format(key))
                 KNN[key].append([temp])
 
     return KNN
@@ -221,7 +224,6 @@ def k_search(k,point_list,class_dictionary):
 
 
 def manhattan_distance(point1,point2):
-    print(point1)
     p1 = point1[0]-point2[0]
     p2 = point1[1]-point2[1]
     return abs(p1)+abs(p2)
@@ -310,7 +312,6 @@ def k_nearest_neighbour(grid_dictionary,k,size,gamma=0.9,flag=1):
             k_points+=k_search(k-present_k,dist,grid_dictionary)
             present_k+=len(k_points)
         
-            
         KNN[tuple(box)]=k_points
     if flag==0:
 
@@ -320,6 +321,7 @@ def k_nearest_neighbour(grid_dictionary,k,size,gamma=0.9,flag=1):
 
         KNN=Probabilistic_KNN(k,KNN,grid_dictionary,gamma,1)
 
+        #print('okay pointses {}'.format(KNN))
     return KNN
 
 
