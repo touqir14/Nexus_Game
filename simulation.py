@@ -117,7 +117,7 @@ class Simulation():
         # front of health bar for protagonist
         pro = p.protagonist.sprite
         if pro:
-            healthPercent = pro.health / p.pro_max_health
+            healthPercent = pro.health / pro.max_health
             front = pygame.Surface(((proHealthBar.get_width()-2)*healthPercent,proHealthBar.get_height()-2))
             front.fill(THECOLORS['green'])
             proHealthBar.blit(front,(1,1))

@@ -9,6 +9,7 @@ import pygame
 from odor import OdorSource
 from pygame.sprite import GroupSingle
 from baseEnviroObj import BaseEnviroObj
+from pygame.colordict import THECOLORS
 
 class BasicFood(BaseEnviroObj):
     '''
@@ -18,6 +19,10 @@ class BasicFood(BaseEnviroObj):
     #p.odors.append(__name__)
     # one image for all the food instances
     image = pygame.Surface((p.basicFoodDiameter,p.basicFoodDiameter))
+    colour = THECOLORS['forestgreen']
+
+    # how much the hero (or any environment object?) will be affected by this type of game object
+    effectvalue = 15
 
     # set food value to positive
     value = 1
@@ -40,5 +45,5 @@ class BasicFood(BaseEnviroObj):
         #self.coord = (float(self.rect.center[0]),float(self.rect.center[1]))
 
         # give this instance an odor so it has a smell in the environment
-        OdorSource(__name__,GroupSingle(self),p.basicFood_odor_intensity,p.basicFoodColour)
+        OdorSource(__name__,GroupSingle(self),p.basicFood_odor_intensity,BasicFood.colour)
         

@@ -43,8 +43,9 @@ class Protagonist(Movable):
         
         # give this instance an odor so it has a smell in the environment
         OdorSource(__name__,GroupSingle(self),p.pro_odor_intensity,p.pro_colour)
-        # give health and endurance
-        self.health = p.pro_max_health
+        # give health
+        self.max_health = 100.0
+        self.health = self.max_health
         #self.endurance = p.pro_max_endurance
         
         # a group to hold the closest food item
@@ -54,27 +55,31 @@ class Protagonist(Movable):
         """
         
         """
-        # move first if mouse input
+        # put AI stuff here
+        # mode 1: move first if mouse input
         self.move(km_state)
         
-        # eat food when close enough
-        for i in p.g_food.sprites():
-            x = i.rect.center[0] - self.rect.center[0]
-            y = i.rect.center[1] - self.rect.center[1]
-            food_radius = int(i.rect.width/2)
-            self_radius = int(self.rect.width/2)
-            if (math.hypot(x, y) - food_radius - self_radius) <= 0:
-                i.kill()
-                self.health += p.food_value
-                if self.health > p.pro_max_health:
-                    self.health = p.pro_max_health
+        # mode 2: move by dykstra's with KNN as cost function
+        #
+        
+        #=======================================================================
+        # # eat food when close enough
+        # for i in p.g_food.sprites():
+        #     x = i.rect.center[0] - self.rect.center[0]
+        #     y = i.rect.center[1] - self.rect.center[1]
+        #     food_radius = int(i.rect.width/2)
+        #     self_radius = int(self.rect.width/2)
+        #     if (math.hypot(x, y) - food_radius - self_radius) <= 0:
+        #         i.kill()
+        #         self.health += p.food_value
+        #         if self.health > p.pro_max_health:
+        #             self.health = p.pro_max_health
+        #=======================================================================
                     
         # get affected by objects if they're on the same grid tile
         for o in p.allObjects.sprites():
             if o.coord == self.coord and o != self:
-                o.affect(self)
-        
-        # put AI stuff here
+                o.affectHealth(self)
         
         
         """

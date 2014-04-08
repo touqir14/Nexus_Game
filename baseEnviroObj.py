@@ -26,6 +26,10 @@ class BaseEnviroObj(pygame.sprite.Sprite):
         #self.coord = startcoord
         self.rect.center = envirogrid.getcenter(self.coord)
         
+        # give health
+        self.max_health = 1.0
+        self.health = self.max_health
+        
     @property
     def coord(self):
         return math.floor(self._coord[0]),math.floor(self._coord[1])
@@ -34,10 +38,18 @@ class BaseEnviroObj(pygame.sprite.Sprite):
     def coord(self, twotuple):
         self._coord = twotuple
         
-    def affect(self, env_obj):
+    def affectHealth(self, env_obj):
         """
-        This method can be overrided by inheriting classes to allow 
-        them to affect other objects in the environment.
+        This method can be overridden by inheriting classes to allow 
+        them to affectHealth other objects in the environment.
+        
+        primarily used against the hero as most objects should only affect the hero.
         """
-        pass
+        env_obj.health += self.effectvalue
+        self.kill()
+        # regulate obj health
+        if env_obj.health <= 0:
+            env_obj.kill()
+        elif env_obj.health > env_obj.max_health:
+            env_obj.health = env_obj.max_health
     

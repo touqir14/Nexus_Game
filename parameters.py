@@ -39,7 +39,6 @@ protagonist = sprite.GroupSingle()
 protagonistDiameter = 20
 pro_starting_point = (env_size[0]-int(protagonistDiameter/2),env_size[1]-int(protagonistDiameter/2))
 pro_max_speed = 1
-pro_max_health = 100.0
 pro_max_endurance = 100.0
 pro_colour = THECOLORS['red3']
 pro_odor_intensity = 450
@@ -56,8 +55,6 @@ ant_odor_intensity = 450
 # food
 g_food = sprite.Group()
 basicFoodDiameter = 15
-food_value = 15
-basicFoodColour = THECOLORS['forestgreen']
 basicFood_odor_intensity = 150
 
 # each loop of the simulation will be tracked by timeStep

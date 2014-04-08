@@ -20,7 +20,7 @@ class PoisonFood(BaseEnviroObj):
     image = pygame.Surface((15,15))
     colour = (200,50,250)
     
-    # how much the hero (or any environment object) will be affected by this type of game object
+    # how much the hero (or any environment object?) will be affected by this type of game object
     effectvalue = -25
 
     # set food value to positive
@@ -46,7 +46,4 @@ class PoisonFood(BaseEnviroObj):
         # give this instance an odor so it has a smell in the environment
         OdorSource(__name__,GroupSingle(self),p.basicFood_odor_intensity,PoisonFood.colour)
         
-    def affect(self, env_obj):
-        env_obj.health += self.effectvalue
-        self.kill()
         

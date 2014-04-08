@@ -18,6 +18,9 @@ class Antagonist(Movable):
     image = pygame.Surface((p.ant_diameter,p.ant_diameter))
     image.fill(p.ant_colour)
     
+    # how much the hero (or any environment object?) will be affected by this type of game object
+    effectvalue = -100
+
     # a value is given to all environment object classes that tell them if the hero likes them or not
     # 0 means not...
     value = 0
@@ -67,7 +70,7 @@ class Antagonist(Movable):
             self_radius = int(self.rect.width/2)
             if (math.hypot(x, y) - pro_radius - self_radius) <= 0:
                 pro.kill()
-                self.health += p.food_value
+                self.health += 15
                 if self.health > p.ant_max_health:
                     self.health = p.ant_max_health
 

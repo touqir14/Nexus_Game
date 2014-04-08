@@ -24,7 +24,7 @@ def imageSetup():
     # regular green food
     BasicFood.image = BasicFood.image.convert_alpha()
     BasicFood.image.fill((0,0,0,0))
-    pygame.draw.circle(BasicFood.image,p.basicFoodColour,BasicFood.image.get_rect().center,int(BasicFood.image.get_rect().width/2))
+    pygame.draw.circle(BasicFood.image,BasicFood.colour,BasicFood.image.get_rect().center,int(BasicFood.image.get_rect().width/2))
     
     # poison food
     PoisonFood.image = PoisonFood.image.convert_alpha()
@@ -63,12 +63,6 @@ if __name__ == '__main__':
                 # safely exit the system
                 pygame.quit()
                 sys.exit()
-            if e.type in (MOUSEBUTTONDOWN,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,KEYUP):
-                km_state.updateState(e)
-#             if e.type == MOUSEBUTTONDOWN:
-#                 p.leftMouse = True
-#             if e.type == MOUSEBUTTONUP:
-#                 p.leftMouse = False
             if e.type == KEYDOWN:
                 if e.key == K_ESCAPE:
                     if p.startup:
@@ -80,38 +74,8 @@ if __name__ == '__main__':
                         p.startup = True
                 if e.key == K_o:
                     p.show_odors^=True # toggle true false
-
-#                 if e.key == K_UP:
-#                     p.up = True
-#                 if e.key == K_DOWN:
-#                     p.down = True
-#                 if e.key == K_LEFT:
-#                     p.left = True
-#                 if e.key == K_RIGHT:
-#                     p.right = True
-#             if e.type == KEYUP:
-#                 if e.key == K_UP:
-#                     p.up = False
-#                 if e.key == K_DOWN:
-#                     p.down = False
-#                 if e.key == K_LEFT:
-#                     p.left = False
-#                 if e.key == K_RIGHT:
-#                     p.right = False
-
-        # user controlled movement of protagonist
-        '''
-        pro = p.protagonist.sprite
-        if pro:
-            if p.up == True:
-                pro.move('up')
-            if p.down == True:
-                pro.move('down')
-            if p.left == True:
-                pro.move('left')
-            if p.right == True:
-                pro.move('right')
-        '''
+            if e.type in (MOUSEBUTTONDOWN,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,KEYUP):
+                km_state.updateState(e)
                 
         if p.startup:
             #iPage.update(pygame.mouse.get_pos())
@@ -147,6 +111,7 @@ if __name__ == '__main__':
             # flip the screen
             screen.blit(env_screen,(p.border,p.border))
             screen.blit(info_screen,(p.border,p.resolution[1]-p.info_size[1]-p.border))
+
         pygame.display.flip()
                 
         # refresh mouse state at end of every loop
