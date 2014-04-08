@@ -1,6 +1,7 @@
 import random
 import time
 import math
+from dijkstra import search
 
 
 sigmoid=lambda x:(2 / (1 + math.exp(-x)))
@@ -387,50 +388,46 @@ def k_nearest_neighbour(grid_dictionary,k,size,gamma=0.9,flag=1):
     return KNN_weights
 
 
-"""
-""""""""""""""""""""""""
-"""""""""""""""""""""""""
-TO MATT: Now the k_nearest_neighbour function returns a dictionary with a list having first value as another dictionary and the second value as a the higher probabilistic class.
-You can run this code like this to see the returned dictionary
-"""""""""""""""""""""""""
-""""""""""""""""""""""""
-
+ 
 if __name__=='__main__':
-    # point_dict={(2,2):[1],(1,3):[0],(2,4):[],(3,3):[],(4,4):[]}
-    # point_dict={(2,2):[1],(1,3):[0],(2,4):[1],(3,3):[1],(4,4):[0]}
-
-grid_dictionary={(4,2):[0],(5,3):[],(4,3):[1],(3,3):[],(6,4):[],(5,4):[],(4,4):[],(3,4):[],(2,4):[0],(5,5):[0],(4,5):[0],(3,5):[1],(4,6):[0]}
-positive=[[1,(4,3)],[2,(3,5)]]
-negative=[[1,(4,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]
-# print(k_search(1,points,point_dict))
-# print(factorial(5))
-# print(combination_calc(96,3))
-# #print("|{}|".)
-# print(binomial_distribution(7,[[1],[3],[4]],[[1],[2],[5],[6]],0.9))
-# print(sampler(3,3,points,[0,1]))
-KNN={(4,4):[[1,(4,3)],[2,(3,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]}
-# print(KNN)
-points_dict={0:[1,2,2,3],1:[1,1,1,2]}
-# print(Probabilistic_KNN(7,KNN,grid_dictionary,0.9))
-# print(sigmoid(0.458))
-temp=weight_assigner(points_dict,[0,1])
-#print(temp[0],temp[1])
-#print(sigmoid(-1))
-        
-
-dictionary={}
-for i in range(5):
-    for j in range(5):
-        dictionary[i,j]=[]
-
-dictionary[2,0]=[1]
-dictionary[1,1]=[1]
-dictionary[1,3]=[1]
-dictionary[3,1]=[0]
-dictionary[3,3]=[1]
-dictionary[1,4]=[0]
-dictionary[2,4]=[0]
-hi=k_nearest_neighbour(dictionary,3,[4,4])
-print(hi)
-
-"""
+    # # point_dict={(2,2):[1],(1,3):[0],(2,4):[],(3,3):[],(4,4):[]}
+    # # point_dict={(2,2):[1],(1,3):[0],(2,4):[1],(3,3):[1],(4,4):[0]}
+ 
+    # grid_dictionary={(4,2):[0],(5,3):[],(4,3):[1],(3,3):[],(6,4):[],(5,4):[],(4,4):[],(3,4):[],(2,4):[0],(5,5):[0],(4,5):[0],(3,5):[1],(4,6):[0]}
+    # positive=[[1,(4,3)],[2,(3,5)]]
+    # negative=[[1,(4,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]
+    # # print(k_search(1,points,point_dict))
+    # # print(factorial(5))
+    # # print(combination_calc(96,3))
+    # # #print("|{}|".)
+    # # print(binomial_distribution(7,[[1],[3],[4]],[[1],[2],[5],[6]],0.9))
+    # # print(sampler(3,3,points,[0,1]))
+    # KNN={(4,4):[[1,(4,3)],[2,(3,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]}
+    # # print(KNN)
+    # points_dict={0:[1,2,2,3],1:[1,1,1,2]}
+    # # print(Probabilistic_KNN(7,KNN,grid_dictionary,0.9))
+    # # print(sigmoid(0.458))
+    # temp=weight_assigner(points_dict,[0,1])
+    # #print(temp[0],temp[1])
+    # #print(sigmoid(-1))
+             
+ 
+ 
+    dictionary={}
+    for i in range(5):
+        for j in range(5):
+            dictionary[i,j]=[]
+ 
+    dictionary[2,0]=[1]
+    dictionary[1,1]=[1]
+    dictionary[1,3]=[1]
+    dictionary[3,1]=[0]
+    dictionary[3,3]=[1]
+    dictionary[1,4]=[0]
+    dictionary[2,4]=[0]
+    hi=k_nearest_neighbour(dictionary,3,[4,4])
+    print(hi)
+    # for i in hi.keys():
+    #     print (i, hi[i][0][0][-1])
+ 
+#     print(search((3,4),(0,0),hi))

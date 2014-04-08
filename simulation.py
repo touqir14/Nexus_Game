@@ -13,6 +13,7 @@ from gridworld import GridWorld
 import knn
 from poisonFood import PoisonFood
 import kmui
+from dijkstra import search
 
 class Simulation():
     '''
@@ -58,7 +59,7 @@ class Simulation():
         #               p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[1]-int(p.basicFoodDiameter/2))))
             #to do: retry if food is close to previous food or object?
 
-        self.knndict = knn.k_nearest_neighbour(envirogrid.value_dict, 4, (envirogrid.width-1,envirogrid.height-1))
+        #self.knndict = knn.k_nearest_neighbour(envirogrid.value_dict, 4, (envirogrid.width-1,envirogrid.height-1))
         
     def run(self, env_screen, km_state):
         """
@@ -69,6 +70,7 @@ class Simulation():
         
         # update background grid
         self.grid.update(km_state.mpos)
+        
         
         # place new objects or delete them, based on mouse input
         if km_state.m_right == kmui.Clicked:
@@ -82,7 +84,7 @@ class Simulation():
                 self.placeObjectAt(self.placeable[self.placing], self.grid.sprite, mcoord)
         
         # update necessary things
-        p.allObjects.update(km_state)
+        p.allObjects.update(km_state, self.grid.sprite)
 #        p.odors.update()
         
         # decrease health and check for death

@@ -42,8 +42,8 @@ class Movable(BaseEnviroObj):
             self.direction = (0.0,0.0)
         self.moveForward()            
     
-    def moveToward(self,pointB):
-        self.direction = unitVec(self.coord, pointB)
+    def moveToward(self,coord):
+        self.direction = unitVec(self.coord, coord)
         self.moveForward()
 
     def moveForward(self):

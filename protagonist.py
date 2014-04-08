@@ -10,6 +10,8 @@ from movable import Movable
 from odor import OdorSource
 import math
 import kmui
+import knn
+import dijkstra
 
 class Protagonist(Movable):
     '''
@@ -51,7 +53,11 @@ class Protagonist(Movable):
         # a group to hold the closest food item
         #self.closest_food = GroupSingle()
         
-    def update(self, km_state):
+        # knn
+        self.knnweights = None
+        self.pathway = None
+
+    def update(self, km_state, grid):
         """
         
         """
@@ -60,8 +66,22 @@ class Protagonist(Movable):
         self.move(km_state)
         
         # mode 2: move by dykstra's with KNN as cost function
-        #
-        
+        # knn
+        if km_state.k == kmui.Hit:
+            #grid = self.grid.sprite
+            self.knnweights = knn.k_nearest_neighbour(grid.value_dict, 5, (grid.width-1, grid.height-1))
+#             print(len(self.knnweights.keys()),len(set(self.knnweights.keys())))
+            pro = p.protagonist.sprite
+            if pro:
+                self.pathway = dijkstra.search(pro.coord, (0,1), self.knnweights)
+                print(self.pathway)
+                
+        if self.pathway:
+            target = self.pathway.pop(0)
+            self.moveToward(target)
+
+        #if km_state.g == kmui.Hit:
+            
         #=======================================================================
         # # eat food when close enough
         # for i in p.g_food.sprites():

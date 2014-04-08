@@ -28,6 +28,7 @@ class KMState(object):
         self.right = Ready
         self.up = Ready
         self.down = Ready
+        self.k = Ready
         #self. = Ready
         
     def updateState(self, e):
@@ -65,6 +66,8 @@ class KMState(object):
                 self.left = Hit
             if e.key == K_RIGHT:
                 self.right = Hit
+            if e.key == K_k:
+                self.k = Hit
         elif e.type == KEYUP:
             if e.key == K_UP:
                 self.up = Released
@@ -74,6 +77,8 @@ class KMState(object):
                 self.left = Released
             if e.key == K_RIGHT:
                 self.right = Released
+            if e.key == K_k:
+                self.k = Released
 
     
     def refresh(self):
@@ -97,6 +102,8 @@ class KMState(object):
         if self.up == Released: self.up = Ready
         if self.down == Hit: self.down = Down
         if self.down == Released: self.down = Ready
+        if self.k == Hit: self.k = Down
+        if self.k == Released: self.k = Ready
 
     def _checkkey(self, k):
         if k == Hit:
