@@ -6,6 +6,7 @@ Created on 2014-02-26
 import pygame
 import parameters as p
 import simulation
+import kmui
 
 class IntroPage():
     '''
@@ -19,10 +20,10 @@ class IntroPage():
         self.opt1_rect = pygame.Rect(int((p.resolution[0]-200)/2),int((p.resolution[1]-30)/2),200,30)
         self.opt1_highlight = 0
         
-    def generateSim(self, mpos, env_rect, gridunit, gridwidth, gridheight):
-        if self.opt1_rect.collidepoint(mpos):
+    def generateSim(self, km_state, env_rect, gridunit, gridwidth, gridheight):
+        if self.opt1_rect.collidepoint(km_state.mpos):
             self.opt1_highlight = 20
-            if p.leftMouse:
+            if km_state.m_left == kmui.Released:
                 return simulation.Simulation(env_rect, gridunit, gridwidth, gridheight)
         else:
             self.opt1_highlight = 0

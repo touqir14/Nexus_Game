@@ -9,6 +9,7 @@ import pygame
 from movable import Movable
 from odor import OdorSource
 import math
+import kmui
 
 class Protagonist(Movable):
     '''
@@ -49,9 +50,13 @@ class Protagonist(Movable):
         # a group to hold the closest food item
         #self.closest_food = GroupSingle()
         
-    def update(self):
+    def update(self, km_state):
         """
+        
         """
+        # move first if mouse input
+        self.move(km_state)
+        
         # eat food when close enough
         for i in p.g_food.sprites():
             x = i.rect.center[0] - self.rect.center[0]
@@ -63,6 +68,11 @@ class Protagonist(Movable):
                 self.health += p.food_value
                 if self.health > p.pro_max_health:
                     self.health = p.pro_max_health
+                    
+        # get affected by objects if they're on the same grid tile
+        for o in p.allObjects.sprites():
+            if o.coord == self.coord and o != self:
+                o.affect(self)
         
         # put AI stuff here
         
@@ -77,8 +87,16 @@ class Protagonist(Movable):
         self.speed = p.pro_max_speed * endurancePercent
         """
     
-    def move(self, direction=None):
-        Movable.move(self, direction=direction)
+    def move(self, km_state):
+        if km_state.left == kmui.Down:
+            super().move('left')
+        if km_state.right == kmui.Down:
+            super().move('right')
+        if km_state.up == kmui.Down:
+            super().move('up')
+        if km_state.down == kmui.Down:
+            super().move('down')
+#        Movable.move(self, direction=direction)
         #self.endurance -= p.endurance_decrease
         #if self.endurance <= 0:
         #    self.endurance = 0.0

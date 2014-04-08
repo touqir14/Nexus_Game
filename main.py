@@ -11,6 +11,8 @@ import parameters as p
 from simulation import Simulation
 from basicFood import BasicFood
 from introPage import IntroPage
+from poisonFood import PoisonFood
+import kmui
 
 def imageSetup():
     """ 
@@ -19,9 +21,15 @@ def imageSetup():
     rather than from within each class that has an image (where 
     'pygame.init()' is not called)
     """
+    # regular green food
     BasicFood.image = BasicFood.image.convert_alpha()
     BasicFood.image.fill((0,0,0,0))
     pygame.draw.circle(BasicFood.image,p.basicFoodColour,BasicFood.image.get_rect().center,int(BasicFood.image.get_rect().width/2))
+    
+    # poison food
+    PoisonFood.image = PoisonFood.image.convert_alpha()
+    PoisonFood.image.fill((0,0,0,0))
+    pygame.draw.circle(PoisonFood.image,PoisonFood.colour,PoisonFood.image.get_rect().center,int(PoisonFood.image.get_rect().width/2))
     
 if __name__ == '__main__':
     # put the window in the centre of your monitor
@@ -34,6 +42,9 @@ if __name__ == '__main__':
     env_screen = pygame.Surface(p.env_size)
     # information display surface
     info_screen = pygame.Surface(p.info_size)
+    
+    # interface event handler
+    km_state = kmui.KMState()
     
     # other housekeeping (some image setup needs to go after 'pygame.init()')
     imageSetup()
@@ -52,10 +63,12 @@ if __name__ == '__main__':
                 # safely exit the system
                 pygame.quit()
                 sys.exit()
-            if e.type == MOUSEBUTTONDOWN:
-                p.leftMouse = True
-            if e.type == MOUSEBUTTONUP:
-                p.leftMouse = False
+            if e.type in (MOUSEBUTTONDOWN,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,KEYUP):
+                km_state.updateState(e)
+#             if e.type == MOUSEBUTTONDOWN:
+#                 p.leftMouse = True
+#             if e.type == MOUSEBUTTONUP:
+#                 p.leftMouse = False
             if e.type == KEYDOWN:
                 if e.key == K_ESCAPE:
                     if p.startup:
@@ -67,25 +80,27 @@ if __name__ == '__main__':
                         p.startup = True
                 if e.key == K_o:
                     p.show_odors^=True # toggle true false
-                if e.key == K_UP:
-                    p.up = True
-                if e.key == K_DOWN:
-                    p.down = True
-                if e.key == K_LEFT:
-                    p.left = True
-                if e.key == K_RIGHT:
-                    p.right = True
-            if e.type == KEYUP:
-                if e.key == K_UP:
-                    p.up = False
-                if e.key == K_DOWN:
-                    p.down = False
-                if e.key == K_LEFT:
-                    p.left = False
-                if e.key == K_RIGHT:
-                    p.right = False
+
+#                 if e.key == K_UP:
+#                     p.up = True
+#                 if e.key == K_DOWN:
+#                     p.down = True
+#                 if e.key == K_LEFT:
+#                     p.left = True
+#                 if e.key == K_RIGHT:
+#                     p.right = True
+#             if e.type == KEYUP:
+#                 if e.key == K_UP:
+#                     p.up = False
+#                 if e.key == K_DOWN:
+#                     p.down = False
+#                 if e.key == K_LEFT:
+#                     p.left = False
+#                 if e.key == K_RIGHT:
+#                     p.right = False
 
         # user controlled movement of protagonist
+        '''
         pro = p.protagonist.sprite
         if pro:
             if p.up == True:
@@ -96,12 +111,13 @@ if __name__ == '__main__':
                 pro.move('left')
             if p.right == True:
                 pro.move('right')
+        '''
                 
         if p.startup:
             #iPage.update(pygame.mouse.get_pos())
             # create a new simulation
             env_rect = env_screen.get_rect()
-            sim = iPage.generateSim(pygame.mouse.get_pos(), env_rect, gridunit=30, gridwidth=26, gridheight=16)
+            sim = iPage.generateSim(km_state, env_rect, gridunit=30, gridwidth=26, gridheight=16)
             if sim != None:
                 p.startup = False
                 
@@ -113,7 +129,7 @@ if __name__ == '__main__':
             info_screen.fill(p.info_bgc)
             
             # run simulation
-            sim.run(env_screen)
+            sim.run(env_screen, km_state)
             
             # proliferate odors
             if p.show_odors: p.odorSources.update()
@@ -133,6 +149,9 @@ if __name__ == '__main__':
             screen.blit(info_screen,(p.border,p.resolution[1]-p.info_size[1]-p.border))
         pygame.display.flip()
                 
+        # refresh mouse state at end of every loop
+        km_state.refresh()
+        
         # delay the simulation if it is running too fast
         clock.tick(p.fps)
 

@@ -50,7 +50,7 @@ class Movable(BaseEnviroObj):
 #        oldcoord = self.coord
         newcoord = ( self.coord[0]+self.direction[0]*self.speed, 
                      self.coord[1]+self.direction[1]*self.speed )
-        
+
         # stay on the screen
         self.coord = self.edgecheck(newcoord)
         

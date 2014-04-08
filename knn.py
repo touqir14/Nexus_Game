@@ -25,7 +25,7 @@ def binomial_distribution(k,positive,negative,gamma):
         decay*=(gamma**combined[i])
     positive_theta=len(positive)/k
     negative_theta=len(negative)/k
-    print(decay,positive_theta,negative_theta)
+    #print(decay,positive_theta,negative_theta)
     probability.append((positive_theta)**len(positive) * (1-positive_theta)**len(negative) *combination_constant[0]*decay)
     probability.append((negative_theta)**len(negative) * (1-negative_theta)**len(positive) *combination_constant[1]*decay)
     return probability
@@ -57,7 +57,7 @@ def weight_assigner(points_dict,classtype):
     max_weight=max(total_weight_list)
     if total_weight_list2.count(max_weight[0])==1:
         dominant_class=max_weight[1]
-        print(dominant_class)
+        #print(dominant_class)
     else:
         max_weight_classes=[]
         for x,y in total_weight_list:
@@ -65,7 +65,7 @@ def weight_assigner(points_dict,classtype):
                 max_weight_classes.append(y)
 
         dominant_class=random.choice(max_weight_classes)
-        print(dominant_class)
+        #print(dominant_class)
     return [weight_dict,dominant_class]
     
 
@@ -394,7 +394,7 @@ TO MATT: Now the k_nearest_neighbour function returns a dictionary with a list h
 You can run this code like this to see the returned dictionary
 """""""""""""""""""""""""
 """"""""""""""""""""""""
-""" 
+
 if __name__=='__main__':
     # point_dict={(2,2):[1],(1,3):[0],(2,4):[],(3,3):[],(4,4):[]}
     # point_dict={(2,2):[1],(1,3):[0],(2,4):[1],(3,3):[1],(4,4):[0]}
@@ -432,3 +432,5 @@ dictionary[1,4]=[0]
 dictionary[2,4]=[0]
 hi=k_nearest_neighbour(dictionary,3,[4,4])
 print(hi)
+
+"""

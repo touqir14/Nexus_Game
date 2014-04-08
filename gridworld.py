@@ -14,13 +14,20 @@ class Block(pygame.sprite.Sprite):
         self.image = pygame.Surface((size,size))
         self.rect = self.image.get_rect()
         # update image
+        self.boarderColour = boarderColour
         pygame.draw.rect(self.image,boarderColour,self.rect.inflate(0,0),1)
         self.rect.topleft = pos
         
-    def update(self):
+        bgc = (20,20,20)
+        highlight = 50
+        self.bgc = (bgc,(bgc[0]+highlight,bgc[1]+highlight,bgc[2]+highlight))
+        
+    def update(self, mpos):
         # get rect at (0,0) for drawing to the block's .image
         #drawrect = pygame.Rect((0,0),self.rect.size)
-        pass
+        zerorect = pygame.Rect((0,0),self.rect.size)
+        self.image.fill(self.bgc[self.rect.collidepoint(mpos)])
+        pygame.draw.rect(self.image,self.boarderColour,zerorect.inflate(0,0),1)
 
 def floorCoord(coordfunc):
     """
@@ -76,10 +83,10 @@ class GridWorld(pygame.sprite.Sprite):
         # move rects by offset amount (grid is centered on screen)
         xoffset = (env_rect.width - self.rect.width)//2
         yoffset = (env_rect.height - self.rect.height)//2
-        self.rect.topleft = (xoffset, yoffset)
-        for s in GridWorld.g_Blocks.sprites():
-            s.rect.left += xoffset
-            s.rect.bottom += yoffset
+        #self.rect.topleft = (xoffset, yoffset)
+        #for s in GridWorld.g_Blocks.sprites():
+        #    s.rect.left += xoffset
+        #    s.rect.bottom += yoffset
     
     @floorCoord
     def istile(self, coord):
@@ -94,16 +101,34 @@ class GridWorld(pygame.sprite.Sprite):
         """
         return [k for k,v in self.itemsdict.items() if len(v.sprites()) == 0]
         
-    def update(self):
+    def update(self, mpos):
         # update / draw blocks
-        #GridWorld.g_Blocks.update()
-        #GridWorld.g_Blocks.draw(self.image)
+        GridWorld.g_Blocks.update(mpos)
+        GridWorld.g_Blocks.draw(self.image)
         '''
         u = self.gunit
         for y in range(self.height):
             for x in range(self.width):
                 pygame.draw.rect(self.image,(200,10,10),((x*u,y*u),(u+1,u+1)),1)
         '''
+    
+    def trackObj(self, env_obj, coord):
+        """
+        remember that there is an object at this position so other objects can query the grid
+        """
+        self.itemsdict[coord].add(env_obj)
+        
+    def getItemAt(self, coord):
+        tilegroup = self.itemsdict.get(coord)
+        if tilegroup and len(tilegroup) > 0:
+            return tilegroup.sprites()[0]
+        return None            
+        
+    def removeItemAt(self, item, coord):
+        tilegroup = self.itemsdict.get(coord)
+        if tilegroup and len(tilegroup) > 0:
+            if tilegroup.has(item):
+                item.kill()
         
     def kill(self):
         """
@@ -127,7 +152,7 @@ class GridWorld(pygame.sprite.Sprite):
         return None
     
     def convPosToCoord(self, screenpos):
-        return (screenpos[0]/self.gunit, screenpos[1]/self.gunit)
+        return (math.floor(screenpos[0]/self.gunit), math.floor(screenpos[1]/self.gunit))
     
     @floorCoord
     def convCoordToPos(self, gridcoord):

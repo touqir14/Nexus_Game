@@ -54,7 +54,7 @@ class Antagonist(Movable):
         # a group to hold the closest food item
         #self.closest_food = GroupSingle()
         
-    def update(self):
+    def update(self, mouse):
         """
         put AI stuff here
         """

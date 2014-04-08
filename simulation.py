@@ -11,6 +11,8 @@ from pygame.colordict import THECOLORS
 from antagonist import Antagonist
 from gridworld import GridWorld
 import knn
+from poisonFood import PoisonFood
+import kmui
 
 class Simulation():
     '''
@@ -40,8 +42,17 @@ class Simulation():
         #adjust valuedict for antagonist
         envirogrid.value_dict[ant_coord].append(Antagonist.value)
         
+        # place objects with mouse. placeable classes must take (grid, coord) as 
+        # variables ie: BasicFood(grid, coord)
+        self.placing = 0
+        self.placeable = [BasicFood, PoisonFood, Antagonist]
+        
         # create food items
-        self.generatefood(amount=20,grid=envirogrid)
+        self.placeObjects(BasicFood, 20, envirogrid)
+        
+        # generate poison item
+        self.placeObjects(PoisonFood, 5, envirogrid)
+        
         #for i in range(p.startingFood):
         #    BasicFood((p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[0]-int(p.basicFoodDiameter/2)),
         #               p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[1]-int(p.basicFoodDiameter/2))))
@@ -49,16 +60,29 @@ class Simulation():
 
         self.knndict = knn.k_nearest_neighbour(envirogrid.value_dict, 4, (envirogrid.width-1,envirogrid.height-1))
         
-
-    def run(self, env_screen):
+    def run(self, env_screen, km_state):
         """
         calling this function represents one time step of the simulation
         """
         # centre grid on screen
         #self.grid.sprite.rect.center = env_screen.get_rect().center
         
+        # update background grid
+        self.grid.update(km_state.mpos)
+        
+        # place new objects or delete them, based on mouse input
+        if km_state.m_right == kmui.Clicked:
+            self.placing = (self.placing+1)%len(self.placeable)
+        if km_state.m_left == kmui.Clicked:
+            mcoord = self.grid.sprite.convPosToCoord(km_state.mpos)
+            item = self.grid.sprite.getItemAt(mcoord)
+            if item:
+                self.grid.sprite.removeItemAt(item,mcoord)
+            else:
+                self.placeObjectAt(self.placeable[self.placing], self.grid.sprite, mcoord)
+        
         # update necessary things
-        p.allObjects.update()
+        p.allObjects.update(km_state)
 #        p.odors.update()
         
         # decrease health and check for death
@@ -70,6 +94,7 @@ class Simulation():
         else:
             # back to menu
             p.startup = True
+        
         
         # increment time step
         p.timeStep += 1
@@ -101,6 +126,13 @@ class Simulation():
         
         # knn info
         drawText("KNN target tile:",screen,(10,50))
+        
+        # what are I placing with the mouse clicks?
+        pos = (500,70)
+        drawText("Placing:",screen,pos)
+        imgOfPlacing = self.placeable[self.placing].image
+        prect = imgOfPlacing.get_rect()
+        screen.blit(imgOfPlacing,((pos[0]+75)-prect.center[0],(pos[1]+5)-prect.center[1]))
 
         '''
         ## protagonist endurance bar
@@ -138,6 +170,27 @@ class Simulation():
             grid.value_dict[coord].append(BasicFood.value)
             BasicFood(grid, coord)#(p.rand.randint(0, gridwidth-1),p.rand.randint(0, gridwidth-1)))
             possiblecoords.remove(coord)
+
+    def placeObjects(self, objclass, amount, grid):
+        """
+        place objects on environment grid in such a way that no more than one is placed per tile
+        """
+        possiblecoords = grid.emptytiles()
+        for n in range(amount):
+            if len(possiblecoords) <= 0: break # no more room for objects
+            coord = p.rand.choice(possiblecoords)
+            grid.value_dict[coord].append(objclass.value)
+            grid.trackObj(objclass(grid, coord), coord)
+            possiblecoords.remove(coord)
+
+    def placeObjectAt(self, objclass, grid, coord):
+        """
+        place object on environment grid at a specified tile if tile is empty
+        """
+        possiblecoords = grid.emptytiles()
+        if coord in possiblecoords:
+            grid.value_dict[coord].append(objclass.value)
+            grid.trackObj(objclass(grid, coord), coord)
 
 def drawText(text, screen, pos, size=15, colour=(200,255,200)):
     """
