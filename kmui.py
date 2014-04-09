@@ -44,10 +44,10 @@ class KMState(object):
             elif e.button == 2:
                 print("middle")
             elif e.button == 4:
-                print("up")
+                #print("up")
                 self.m_wheel = Up
             elif e.button == 5:
-                print("down")
+                #print("down")
                 self.m_wheel = Down
         elif e.type == MOUSEBUTTONUP:
             # left

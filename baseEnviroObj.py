@@ -11,6 +11,7 @@ class BaseEnviroObj(pygame.sprite.Sprite):
     '''
     a base environment object has coordinates and inits properly to the environment grid
     '''
+    effectvalue = 0
 
 
     def __init__(self, image, envirogrid, startcoord):
@@ -38,7 +39,18 @@ class BaseEnviroObj(pygame.sprite.Sprite):
     def coord(self, twotuple):
         self._coord = twotuple
         
-    def affectHealth(self, env_obj):
+    def regulatehealth(self):
+        """
+        am i dead? i hope not
+        make sure health doesn't go below zero or above max
+        kill self if necessary
+        """
+        if self.health <= 0:
+            self.kill()
+        elif self.health > self.max_health:
+            self.health = self.max_health
+        
+    def affectHealth(self, env_obj, touqirs_value_dict):
         """
         This method can be overridden by inheriting classes to allow 
         them to affectHealth other objects in the environment.
@@ -47,9 +59,8 @@ class BaseEnviroObj(pygame.sprite.Sprite):
         """
         env_obj.health += self.effectvalue
         self.kill()
-        # regulate obj health
-        if env_obj.health <= 0:
-            env_obj.kill()
-        elif env_obj.health > env_obj.max_health:
-            env_obj.health = env_obj.max_health
+        if self.value in touqirs_value_dict[self.coord]:
+            touqirs_value_dict[self.coord].remove(self.value)
+        # regulate obj health. dead?
+        env_obj.regulatehealth()
     

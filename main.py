@@ -13,6 +13,7 @@ from basicFood import BasicFood
 from introPage import IntroPage
 from poisonFood import PoisonFood
 import kmui
+from target import Target
 
 def imageSetup():
     """ 
@@ -30,6 +31,14 @@ def imageSetup():
     PoisonFood.image = PoisonFood.image.convert_alpha()
     PoisonFood.image.fill((0,0,0,0))
     pygame.draw.circle(PoisonFood.image,PoisonFood.colour,PoisonFood.image.get_rect().center,int(PoisonFood.image.get_rect().width/2))
+    
+    # target
+    Target.image = Target.image.convert_alpha()
+    Target.image.fill((0,0,0,0))
+    unit = Target.unit
+    pygame.draw.line(Target.image, Target.colour, (0,unit//2), (unit,unit//2))
+    pygame.draw.line(Target.image, Target.colour, (unit//2,0), (unit//2,unit))
+    pygame.draw.circle(Target.image, Target.colour, (unit//2,unit//2), unit//2, 1)
     
 if __name__ == '__main__':
     # put the window in the centre of your monitor
@@ -50,7 +59,7 @@ if __name__ == '__main__':
     imageSetup()
     
     #
-    iPage = IntroPage()
+    iPage = IntroPage(lambda: km_state.mpos)
     
     # create a clock to time the simulation
     clock = pygame.time.Clock()
@@ -78,7 +87,7 @@ if __name__ == '__main__':
                 km_state.updateState(e)
                 
         if p.startup:
-            #iPage.update(pygame.mouse.get_pos())
+            #iPage.update(km_state.mpos)
             # create a new simulation
             env_rect = env_screen.get_rect()
             sim = iPage.generateSim(km_state, env_rect, gridunit=30, gridwidth=26, gridheight=16)
@@ -103,6 +112,7 @@ if __name__ == '__main__':
             # draw the environment
             sim.drawWorld(env_screen)
             p.allObjects.draw(env_screen)
+            Target.g_targ.draw(env_screen)
             if p.show_odors: p.odorSources.draw(env_screen)
             
             # show the numbers and life bars
@@ -113,7 +123,15 @@ if __name__ == '__main__':
             screen.blit(info_screen,(p.border,p.resolution[1]-p.info_size[1]-p.border))
 
         pygame.display.flip()
-                
+
+        # adjust game speed with mouse wheel
+#         if km_state.m_wheel == kmui.Up:
+#             p.fps += 2
+#         elif km_state.m_wheel == kmui.Down:
+#             p.fps -= 2
+#             if p.fps < 5:
+#                 p.fps = 5
+            
         # refresh mouse state at end of every loop
         km_state.refresh()
         

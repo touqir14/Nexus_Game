@@ -14,16 +14,21 @@ import knn
 from poisonFood import PoisonFood
 import kmui
 from dijkstra import search
+from target import Target
 
 class Simulation():
     '''
     classdocs
     '''
 
-    def __init__(self, env_rect, gridunit, gridwidth, gridheight):
+    def __init__(self, env_rect, envirogrid, mode=1):
         '''
         Constructor
         '''
+        self.mode = mode
+        heromovestyle = mode        # mode 1 = user control    2 = follow the clicks
+        
+        
         # destroy previous simulation
         for i in p.allObjects.sprites():
             i.kill()
@@ -32,27 +37,33 @@ class Simulation():
         p.timeStep = 0
         
         # create environment
-        envirogrid = GridWorld(env_rect, gridunit, gridwidth, gridheight)
-        self.grid = pygame.sprite.GroupSingle()
-        self.grid.add(envirogrid)
+        self.g_grid = pygame.sprite.GroupSingle()
+        self.g_grid.add(envirogrid)
         
         # create protagonist
-        p.protagonist.add(Protagonist(envirogrid))
-        ant_coord = (0,0)
-        p.antagonist.add(Antagonist(envirogrid, ant_coord))
-        #adjust valuedict for antagonist
-        envirogrid.value_dict[ant_coord].append(Antagonist.value)
+        p.protagonist.add(Protagonist(envirogrid, heromovestyle))
         
-        # place objects with mouse. placeable classes must take (grid, coord) as 
-        # variables ie: BasicFood(grid, coord)
         self.placing = 0
-        self.placeable = [BasicFood, PoisonFood, Antagonist]
+        if mode == 1:
+            ant_coord = (0,0)
+            p.antagonist.add(Antagonist(envirogrid, ant_coord, self.mode))
+            #adjust valuedict for antagonist
+            envirogrid.value_dict[ant_coord].append(Antagonist.value)
+
+            # place objects with mouse. placeable classes must take (grid, coord) as 
+            # variables ie: BasicFood(grid, coord)
+            self.placeable = [BasicFood, PoisonFood, Antagonist]
+            # create food items
+            self.placeObjects(BasicFood, 20, envirogrid)
+            # generate poison item
+            self.placeObjects(PoisonFood, 5, envirogrid)
         
-        # create food items
-        self.placeObjects(BasicFood, 20, envirogrid)
-        
-        # generate poison item
-        self.placeObjects(PoisonFood, 5, envirogrid)
+        if mode == 2:
+            self.placeable = [Target, BasicFood, PoisonFood]
+            # create food items
+            self.placeObjects(BasicFood, 30, envirogrid)
+            # generate poison item
+            self.placeObjects(PoisonFood, 15, envirogrid)        
         
         #for i in range(p.startingFood):
         #    BasicFood((p.rand.randint(int(p.basicFoodDiameter/2), p.env_size[0]-int(p.basicFoodDiameter/2)),
@@ -66,31 +77,31 @@ class Simulation():
         calling this function represents one time step of the simulation
         """
         # centre grid on screen
-        #self.grid.sprite.rect.center = env_screen.get_rect().center
+        #self.g_grid.sprite.rect.center = env_screen.get_rect().center
         
         # update background grid
-        self.grid.update(km_state.mpos)
+        self.g_grid.update(km_state.mpos)
         
         
         # place new objects or delete them, based on mouse input
         if km_state.m_right == kmui.Clicked:
             self.placing = (self.placing+1)%len(self.placeable)
         if km_state.m_left == kmui.Clicked:
-            mcoord = self.grid.sprite.convPosToCoord(km_state.mpos)
-            item = self.grid.sprite.getItemAt(mcoord)
+            mcoord = self.g_grid.sprite.convPosToCoord(km_state.mpos)
+            item = self.g_grid.sprite.getItemAt(mcoord)
             if item:
-                self.grid.sprite.removeItemAt(item,mcoord)
+                self.g_grid.sprite.removeItemAt(item,mcoord)
             else:
-                self.placeObjectAt(self.placeable[self.placing], self.grid.sprite, mcoord)
+                self.placeObjectAt(self.placeable[self.placing], self.g_grid.sprite, mcoord)
         
         # update necessary things
-        p.allObjects.update(km_state, self.grid.sprite)
+        p.allObjects.update(km_state, self.g_grid.sprite)
 #        p.odors.update()
         
         # decrease health and check for death
         pro = p.protagonist.sprite
         if pro:
-            pro.health -= p.health_step_decrease
+            pro.health -= p.health_step_decrease if self.mode != 2 else 0
             if pro.health <= 0:
                 pro.kill()
         else:
@@ -102,7 +113,7 @@ class Simulation():
         p.timeStep += 1
     
     def drawWorld(self, screen):
-        self.grid.draw(screen)
+        self.g_grid.draw(screen)
     
     def displayStats(self, screen):
         ## protagonist health bar
@@ -124,17 +135,19 @@ class Simulation():
             front.fill(THECOLORS['green'])
             proHealthBar.blit(front,(1,1))
 
-        screen.blit(proHealthBar,(9,9))
+        screen.blit(proHealthBar,(9,19))
         
-        # knn info
-        drawText("KNN target tile:",screen,(10,50))
+        # timer for user control mode
+        if self.mode == 1:
+            txt = "Survival time: {}.{}".format(p.timeStep//p.fps,int(p.timeStep%p.fps*3.3))
+            drawText(txt,screen,(10,50))
         
         # what are I placing with the mouse clicks?
-        pos = (500,70)
+        pos = (500,65)
         drawText("Placing:",screen,pos)
         imgOfPlacing = self.placeable[self.placing].image
         prect = imgOfPlacing.get_rect()
-        screen.blit(imgOfPlacing,((pos[0]+75)-prect.center[0],(pos[1]+5)-prect.center[1]))
+        screen.blit(imgOfPlacing,((pos[0]+87)-prect.center[0],(pos[1]+8)-prect.center[1]))
 
         '''
         ## protagonist endurance bar
@@ -191,10 +204,13 @@ class Simulation():
         """
         possiblecoords = grid.emptytiles()
         if coord in possiblecoords:
-            grid.value_dict[coord].append(objclass.value)
-            grid.trackObj(objclass(grid, coord), coord)
+            if objclass != Target: grid.value_dict[coord].append(objclass.value)
+            if objclass == Antagonist:
+                grid.trackObj(objclass(grid, coord, self.mode), coord)
+            else:
+                grid.trackObj(objclass(grid, coord), coord)
 
-def drawText(text, screen, pos, size=15, colour=(200,255,200)):
+def drawText(text, screen, pos, size=25, colour=(200,255,200)):
     """
     helper function to simplify text to screen
     """

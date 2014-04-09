@@ -4,19 +4,41 @@ import math
 from dijkstra import search
 
 
-sigmoid=lambda x:(2 / (1 + math.exp(-x)))
+sigmoid=lambda x:(2 / (1 + math.exp(-x))) #I have added some details about this function in a document
 
 def factorial(f):
+    """
+    A "f" factorial calculator
+    >>> factorial(5)
+    120
+
+    >>> factorial(9)
+    362880
+    """
     result=1
     for i in range(f):
         result*=(i+1)
     return result
 
 def combination_calc(n,r):
+    """
+    function calculates the combination constant found in the formula of binomial_distribution
+    >>> combination_calc(10,4)
+    210
+    >>> combination_calc(5,3)
+    10
+    """
     combination=(factorial(n)/(factorial(n-r)*factorial(r)))
     return combination
 
 def binomial_distribution(k,positive,negative,gamma):
+    """
+    probability[Probability of finding positive, Probability of finding negative]
+    i have used gamma to give weights to each point and it is dependent on how far away they are from query point.
+    I have also uploaded a document explaining how i use gamma and how i derive decay from it.
+    That document also also refers to the formula of binomial_distribution
+    """
+    # print("positive is {}, negative is {}".format(positive,negative))
     probability=[]
     decay=1
     combined=positive+negative
@@ -26,16 +48,17 @@ def binomial_distribution(k,positive,negative,gamma):
         decay*=(gamma**combined[i])
     positive_theta=len(positive)/k
     negative_theta=len(negative)/k
-    #print(decay,positive_theta,negative_theta)
+    # print(decay,positive_theta,negative_theta)
     probability.append((positive_theta)**len(positive) * (1-positive_theta)**len(negative) *combination_constant[0]*decay)
     probability.append((negative_theta)**len(negative) * (1-negative_theta)**len(positive) *combination_constant[1]*decay)
     return probability
 
 def weight_assigner(points_dict,classtype):
     """
+    weight_dict has keys as 0(if exists) and 1(if exists) and the values are a list of weights of points and the last value of the list is the sum of the weights.  
     returns a list [weight_dict,dominant_class]
-    total_weight_list=[[total weight, class_type].....]
-    total_weight_list2=[total_weight.......]
+    total_weight_list=[[total weight, class_type].....] contains a list which contains total weight for a class and then next value is the classtype
+    total_weight_list2=[total_weight.......] Contains the total combined weights of each class
     """
     
     weight_dict={}
@@ -56,9 +79,12 @@ def weight_assigner(points_dict,classtype):
         total_weight_list2.append(total_weight)
 
     max_weight=max(total_weight_list)
+
+    # if there is only 1 maximum weight, we select that class which has this weight as the dominant class 
     if total_weight_list2.count(max_weight[0])==1:
         dominant_class=max_weight[1]
         #print(dominant_class)
+    #in case if we have multiple equal maximum weights, we randomnly choose a dominant weight
     else:
         max_weight_classes=[]
         for x,y in total_weight_list:
@@ -67,14 +93,17 @@ def weight_assigner(points_dict,classtype):
 
         dominant_class=random.choice(max_weight_classes)
         #print(dominant_class)
+    # print (weight_dict)
     return [weight_dict,dominant_class]
     
 
 def sampler(times,size,points,point_class):
     """
+    This is a generic multiclass sampler, used to produce fake samples of each class depending on the probability distribution of each class.
     points=[distance, coordinates, classtype]
     probability dictionary is used to record the probabilities of each classes
     This returns a sampled_dict that contains a list of occurences of each class represented with distance
+    This is discussed in detail in my documents.
     """
     distance=points[0][0]
     probability_boundary={}
@@ -127,16 +156,20 @@ def sampler(times,size,points,point_class):
 
 def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
     """
+    This function can calculate weights and probability depeinding on the flag that is passed
     flag 1 means to use weighted KNN. flag 0 means to use probabilistic binomial KNN
+    This is discussed in detail in my document
     """
     keys=KNN.keys()
-    positive=[]
-    negative=[]
-    spoints=[]
     KNN_weights={}
+    KNN_probability={}
 
     # print(list(keys).sort())
     for key in keys: 
+        positive=[]
+        negative=[]
+        spoints=[]
+    
         # print('key {}'.format(key))
         if len(KNN[key])>k: #In case our KNN has more points than kpoints and we need to create fake samples
             # print('1st worlde {}'.format(key))
@@ -184,32 +217,9 @@ def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
 
             # print(positive,negative)
             if flag==0:
+
                 probability=binomial_distribution(k,positive,negative,gamma)
-                KNN[key].append(probability)
-            elif flag==1:
-                _dict = {}
-                if len(positive) > 0:
-                    _dict[1]=positive
-                if len(negative) > 0:
-                    _dict[0]=negative
-                temp=weight_assigner(_dict,list(_dict.keys()))
-                # print('temp {}'.format(temp))
-                KNN_weights[key]=[temp]
-
-        if len(KNN[key])<=k:
-            # print('2nd worlde {}'.format(key))
-
-            for i in KNN[key]:
-                # print("iiiieeee {}".format(i))
-                if point_dictionary[tuple(i[1])]==[1]:
-                    positive.append(i[0])
-                if point_dictionary[tuple(i[1])]==[0]:
-                    negative.append(i[0])
-
-            if flag==0:
-
-                probability=binomial_distribution(len(KNN[key]),positive,negative,gamma)
-                KNN[key].append(probability)
+                KNN_probability[key]=[{0:[probability[1]],1:[probability[0]]},max(probability[0],probability[1])]
 
             elif flag==1:
                 _dict = {}
@@ -220,10 +230,44 @@ def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
                 temp=weight_assigner(_dict,list(_dict.keys()))
                 # print('temp {}'.format(temp))
                 KNN_weights[key]=temp
+
+            # print("k is great")
+
+        if len(KNN[key])<=k:
+        
+
+            for i in KNN[key]:
                 
+                if point_dictionary[tuple(i[1])]==[1]:
+                    positive.append(i[0])
+                if point_dictionary[tuple(i[1])]==[0]:
+                    negative.append(i[0])
 
-    return KNN_weights
+            # print(KNN[key])
 
+            if flag==0:
+
+                probability=binomial_distribution(len(KNN[key]),positive,negative,gamma)
+                KNN_probability[key]=[{0:[probability[1]],1:[probability[0]]},max(probability[0],probability[1])]
+
+            elif flag==1:
+                _dict = {}
+                if len(positive) > 0:
+                    _dict[1]=positive
+                if len(negative) > 0:
+                    _dict[0]=negative
+                temp=weight_assigner(_dict,list(_dict.keys()))
+                # print('temp {}'.format(temp))
+                KNN_weights[key]=temp
+                # print(temp)
+                
+                # print("k is less")
+
+    if flag==1:
+        return KNN_weights
+
+    if flag==0:
+        return KNN_probability
 
 
 
@@ -231,6 +275,8 @@ def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
 def k_search(k,point_list,class_dictionary):
     """
     returns a list of KNN points
+    It sees if the points in point_list is empty boxes(does not contain any object like food). 
+    Any empty boxes found is considered as points of the set of k-points
     """
     
     knn_points=[]
@@ -245,18 +291,25 @@ def k_search(k,point_list,class_dictionary):
 
 
 def manhattan_distance(point1,point2):
+    """
+    Calculates manhattan distance between two points
+    >>> manhattan_distance((5,4),(6,7))
+    4
+    """
     p1 = point1[0]-point2[0]
     p2 = point1[1]-point2[1]
     return abs(p1)+abs(p2)
 
 
 
-def k_nearest_neighbour(grid_dictionary,k,size,gamma=0.9,flag=1):
+def k_nearest_neighbour_searcher(grid_dictionary,k,size,gamma=0.9,flag=1):
     """
     This function assigns k nearest neighbours to each empty box and returns a dictionary containing the nearsest neighbours for all the empty boxes
+    This is discussed in detail in my document
     """
     KNN={}
     KNN_weights={}
+    KNN_probability={}
     move_up=(0,-1) 
     move_down=(0,1) 
     move_left=(-1,0) 
@@ -269,38 +322,39 @@ def k_nearest_neighbour(grid_dictionary,k,size,gamma=0.9,flag=1):
         if len(grid_dictionary[box])==0:
             todo.append(box)
     # print(todo)
-    for box in todo:#has to be todo
+    for box in todo:
         counter=0
         boundary=[]
         to_visit=[]
-        to_visit_copy=[box]
+        prev_visit=[box]
+        
         
         while(present_k<k):
             counter+=1
                 
-            for cell in to_visit_copy:
+            for cell in prev_visit:
 
-                if counter==1:
+                if counter==1: #We will only have the query box in the first iteration
 
-                    if box[1]>0:
+                    if box[1]>0: #if no immediate above boundary is there
 
         
                         to_visit.append([box[0],box[1]+move_up[1]])
                     
 
-                    if box[1]<size[1]:
+                    if box[1]<size[1]: #if no immediate down boundary is there
 
 
                         to_visit.append([box[0],box[1]+move_down[1]])
 
 
-                    if box[0]>0:
+                    if box[0]>0: #if no immediate left boundary is there
 
 
                         to_visit.append([box[0]+move_left[0],box[1]])
 
 
-                    if box[0]<size[0]:
+                    if box[0]<size[0]: #if no immediate right boundary is there
 
 
                         to_visit.append([box[0]+move_right[0],box[1]])
@@ -308,62 +362,59 @@ def k_nearest_neighbour(grid_dictionary,k,size,gamma=0.9,flag=1):
                 else:
 
 
-                    if cell[0]==box[0] and cell[1]<box[1]:
+                    if cell[0]==box[0] and cell[1]<box[1]:#if cell is vertically above query box and on same vertical axis line
 
-                        if cell[0]>0:
+                        if cell[0]>0: #if no immediate left boundary
 
                             to_visit.append([cell[0]+move_left[0],cell[1]])
 
-                        if cell[0]<size[0]:
+                        if cell[0]<size[0]: #If no immediate right boundary
 
                             to_visit.append([cell[0]+move_right[0],cell[1]])
 
-                        if cell[1]>0: #make sure there is an up coordinate and also that up hasnt reached the upper horizontal border
+                        if cell[1]>0: #if there is no immediate boundary above
                             
                             to_visit.append([cell[0],cell[1]+move_up[1]])
 
-                    elif cell[0]==box[0] and cell[1]>box[1]:
+                    elif cell[0]==box[0] and cell[1]>box[1]: #if cell is vertically below query box and on same vertical axis line 
 
-                        if cell[0]>0:
+                        if cell[0]>0:#if no immediate left boundary
 
                             to_visit.append([cell[0]+move_left[0],cell[1]])
 
-                        if cell[0]<size[0]:
+                        if cell[0]<size[0]:#If no immediate right boundary
 
                             to_visit.append([cell[0]+move_right[0],cell[1]])
 
-                        if cell[1]<size[1]: #make sure there is an up coordinate and also that up hasnt reached the upper horizontal border
+                        if cell[1]<size[1]: #If there is no immediate boundary below
                             
                             to_visit.append([cell[0],cell[1]+move_down[1]])
 
 
-                    elif cell[0]>0 and cell[0]<box[0]:
+                    elif cell[0]>0 and cell[0]<box[0]:#If our cell is on the left side of query box(it can be above or down) and also if the boundary is not 
+                    #immediately to its left side 
 
                         to_visit.append([cell[0]+move_left[0],cell[1]])
 
-                    elif cell[0]<size[0] and cell[0]>box[0]:
+                    elif cell[0]<size[0] and cell[0]>box[0]:#If our cell is on the right side of query box(it can be above or down) and also if the boundary is not 
+                    #immediately to its right side
 
                         to_visit.append([cell[0]+move_right[0],cell[1]])
 
-            if len(to_visit)==0:
+            if len(to_visit)==0: #This will be true in case we assign a k greater than the total number of points
 
                 break
 
-            del to_visit_copy
-
-            to_visit_copy=[]
+            prev_visit=[]
 
             dist=[]
 
             for i in to_visit:
 
-                to_visit_copy.append(i)
+                prev_visit.append(i)
 
                 dist.append([manhattan_distance(i,box),i])
 
-            del to_visit
-
-            # print(dist)
 
             to_visit=[]
 
@@ -371,63 +422,68 @@ def k_nearest_neighbour(grid_dictionary,k,size,gamma=0.9,flag=1):
 
             present_k=len(k_points)
 
-            # print(present_k)
         
         KNN[tuple(box)]=k_points
     # print('nineteenfour {}'.format(KNN[(19,4)]))
     # print("KNN {}".format(KNN))
     if flag==0:
 
-        KNN=Probabilistic_KNN(k,KNN,grid_dictionary,gamma,0)
+        KNN_probability=Probabilistic_KNN(k,KNN,grid_dictionary,gamma,0)
+        return KNN_probability
         
     if flag==1:
 
         KNN_weights=Probabilistic_KNN(k,KNN,grid_dictionary,gamma,1)
+        return KNN_weights
 
         #print('okay pointses {}'.format(KNN))
-    return KNN_weights
+    
 
-
- 
-if __name__=='__main__':
-    # # point_dict={(2,2):[1],(1,3):[0],(2,4):[],(3,3):[],(4,4):[]}
-    # # point_dict={(2,2):[1],(1,3):[0],(2,4):[1],(3,3):[1],(4,4):[0]}
- 
-    # grid_dictionary={(4,2):[0],(5,3):[],(4,3):[1],(3,3):[],(6,4):[],(5,4):[],(4,4):[],(3,4):[],(2,4):[0],(5,5):[0],(4,5):[0],(3,5):[1],(4,6):[0]}
-    # positive=[[1,(4,3)],[2,(3,5)]]
-    # negative=[[1,(4,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]
-    # # print(k_search(1,points,point_dict))
-    # # print(factorial(5))
-    # # print(combination_calc(96,3))
-    # # #print("|{}|".)
-    # # print(binomial_distribution(7,[[1],[3],[4]],[[1],[2],[5],[6]],0.9))
-    # # print(sampler(3,3,points,[0,1]))
-    # KNN={(4,4):[[1,(4,3)],[2,(3,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]}
-    # # print(KNN)
-    # points_dict={0:[1,2,2,3],1:[1,1,1,2]}
-    # # print(Probabilistic_KNN(7,KNN,grid_dictionary,0.9))
-    # # print(sigmoid(0.458))
-    # temp=weight_assigner(points_dict,[0,1])
-    # #print(temp[0],temp[1])
-    # #print(sigmoid(-1))
-             
- 
- 
-    dictionary={}
-    for i in range(5):
-        for j in range(5):
-            dictionary[i,j]=[]
- 
-    dictionary[2,0]=[1]
-    dictionary[1,1]=[1]
-    dictionary[1,3]=[1]
-    dictionary[3,1]=[0]
-    dictionary[3,3]=[1]
-    dictionary[1,4]=[0]
-    dictionary[2,4]=[0]
-    hi=k_nearest_neighbour(dictionary,3,[4,4])
-    print(hi)
-    # for i in hi.keys():
-    #     print (i, hi[i][0][0][-1])
- 
-#     print(search((3,4),(0,0),hi))
+#===============================================================================
+# 
+# if __name__=='__main__':
+#     # # point_dict={(2,2):[1],(1,3):[0],(2,4):[],(3,3):[],(4,4):[]}
+#     # # point_dict={(2,2):[1],(1,3):[0],(2,4):[1],(3,3):[1],(4,4):[0]}
+# 
+#     # grid_dictionary={(4,2):[0],(5,3):[],(4,3):[1],(3,3):[],(6,4):[],(5,4):[],(4,4):[],(3,4):[],(2,4):[0],(5,5):[0],(4,5):[0],(3,5):[1],(4,6):[0]}
+#     # positive=[[1,(4,3)],[2,(3,5)]]
+#     # negative=[[1,(4,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]
+#     # # print(k_search(1,points,point_dict))
+#     # # print(factorial(5))
+#     # # print(combination_calc(96,3))
+#     # # #print("|{}|".)
+#     # # print(binomial_distribution(7,[[1],[3],[4]],[[1],[2],[5],[6]],0.9))
+#     # # print(sampler(3,3,points,[0,1]))
+#     # KNN={(4,4):[[1,(4,3)],[2,(3,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]}
+#     # # print(KNN)
+#     # points_dict={0:[1,2,2,3],1:[1,1,1,2]}
+#     # # print(Probabilistic_KNN(7,KNN,grid_dictionary,0.9))
+#     # # print(sigmoid(0.458))
+#     # temp=weight_assigner(points_dict,[0,1])
+#     # #print(temp[0],temp[1])
+#     # #print(sigmoid(-1))
+#             
+# 
+# 
+#     dictionary={}
+#     for i in range(5):
+#         for j in range(5):
+#             dictionary[i,j]=[]
+# 
+#     dictionary[2,0]=[1]
+#     dictionary[0,3]=[1]
+#     dictionary[1,1]=[1]
+#     dictionary[1,3]=[1]
+#     dictionary[3,1]=[0]
+#     dictionary[3,3]=[1]
+#     dictionary[1,4]=[0]
+#     dictionary[2,4]=[0]
+#     hi=k_nearest_neighbour_searcher(dictionary,5,[4,4],0.9,0)
+#     # print(hi)
+#     # for i in hi.keys():
+#     #     print (i, hi[i][0][0][-1])
+# 
+#     print(search((0,4),(3,4),hi))
+#     print(hi)
+#     # print(hi)
+#===============================================================================

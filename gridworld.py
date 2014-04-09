@@ -46,7 +46,8 @@ class GridWorld(pygame.sprite.Sprite):
 
     def __init__(self, env_rect, Gunit, Gwidth, Gheight):
         '''
-        Constructor
+        Create a new grid where Gunit is the width and height of each tile ie. the unit size,
+        Gwidth and G height are the number of tiles across and dorwn respectively.
         '''
         self.gunit = Gunit
         self.width = Gwidth
@@ -128,7 +129,11 @@ class GridWorld(pygame.sprite.Sprite):
         tilegroup = self.itemsdict.get(coord)
         if tilegroup and len(tilegroup) > 0:
             if tilegroup.has(item):
+                # kill from all groups
                 item.kill()
+                # also remove from toquir's knn value dict
+                if item.value in self.value_dict[coord]:
+                    self.value_dict[coord].remove(item.value)
         
     def kill(self):
         """

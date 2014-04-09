@@ -12,6 +12,8 @@ import math
 import kmui
 import knn
 import dijkstra
+from target import Target
+import sys
 
 class Protagonist(Movable):
     '''
@@ -21,98 +23,82 @@ class Protagonist(Movable):
     image = pygame.Surface((p.protagonistDiameter,p.protagonistDiameter))
     image.fill(p.pro_colour)
 
-    def __init__(self, envirogrid):
+    # how much the hero will affect other objects
+    effectvalue = 100
+
+
+    def __init__(self, envirogrid, movestyle):
         '''
         Constructor
         '''
         super().__init__(p.pro_max_speed, envirogrid, Protagonist.image, (99,99))
-        ## required by Sprite()
-        # initialize Sprite() so this instance can be updated and drawn
-        #Sprite.__init__(self)
-        # give protagonist a rect
-        #self.rect = Protagonist.image.get_rect()
-        
-        ## required by Movable()
-        #Movable.__init__(self, p.pro_max_speed)
         
         # add instance to simulation list groups and control group
         p.allObjects.add(self)
         p.protagonist.add(self)
         
-        
-        #self.coord = (float(self.rect.center[0]),float(self.rect.center[1]))
-
+        self._movestyle = movestyle
         
         # give this instance an odor so it has a smell in the environment
         OdorSource(__name__,GroupSingle(self),p.pro_odor_intensity,p.pro_colour)
-        # give health
+
+        # adjust health from super class
         self.max_health = 100.0
         self.health = self.max_health
-        #self.endurance = p.pro_max_endurance
         
-        # a group to hold the closest food item
-        #self.closest_food = GroupSingle()
+        # adjust rate of movement from Moveable class
+        self.rateOfMovement = 4
         
-        # knn
+        # knn memoization
         self.knnweights = None
-        self.pathway = None
+        self.pathway = []
 
     def update(self, km_state, grid):
         """
         
         """
+        self.decreaseMoveCountdown(km_state)
         # put AI stuff here
         # mode 1: move first if mouse input
-        self.move(km_state)
+        if self._movestyle == 1:
+            self.move(km_state)
         
         # mode 2: move by dykstra's with KNN as cost function
-        # knn
-        if km_state.k == kmui.Hit:
-            #grid = self.grid.sprite
-            self.knnweights = knn.k_nearest_neighbour(grid.value_dict, 5, (grid.width-1, grid.height-1))
-#             print(len(self.knnweights.keys()),len(set(self.knnweights.keys())))
-            pro = p.protagonist.sprite
-            if pro:
-                self.pathway = dijkstra.search(pro.coord, (0,1), self.knnweights)
-                print(self.pathway)
+        elif self._movestyle == 2:
+            # chase Target if exists
+            # (target is placed on the grid using Simulation.placeObjectAt() within Simulation.run()
+            if len(self.pathway) > 0:
+                if self.movementCountdown <= 0:
+                    target_coord = self.pathway.pop(0)
+                    self.moveToward(target_coord)
                 
-        if self.pathway:
-            target = self.pathway.pop(0)
-            self.moveToward(target)
-
-        #if km_state.g == kmui.Hit:
-            
-        #=======================================================================
-        # # eat food when close enough
-        # for i in p.g_food.sprites():
-        #     x = i.rect.center[0] - self.rect.center[0]
-        #     y = i.rect.center[1] - self.rect.center[1]
-        #     food_radius = int(i.rect.width/2)
-        #     self_radius = int(self.rect.width/2)
-        #     if (math.hypot(x, y) - food_radius - self_radius) <= 0:
-        #         i.kill()
-        #         self.health += p.food_value
-        #         if self.health > p.pro_max_health:
-        #             self.health = p.pro_max_health
-        #=======================================================================
+            else:
+                target = Target.g_targ.sprite
+                if target:
+                    targcoord = target.coord
                     
+                    # first check if target has been reached
+                    if self.coord == targcoord:
+                        target.kill()
+                    else:
+                        # knn
+                        self.knnweights = knn.k_nearest_neighbour_searcher(grid.value_dict, 8, (grid.width-1, grid.height-1),.9,1)
+                        self.pathway = dijkstra.search(self.coord, targcoord, self.knnweights)
+                
         # get affected by objects if they're on the same grid tile
         for o in p.allObjects.sprites():
             if o.coord == self.coord and o != self:
-                o.affectHealth(self)
+                o.affectHealth(self, grid.value_dict)
         
-        
-        """
-        # endurance
-        self.endurance += p.endurance_increase
-        if self.endurance > p.pro_max_endurance:
-            self.endurance = p.pro_max_endurance
-            
-        endurancePercent = self.endurance / p.pro_max_endurance
-        self.speed = p.pro_max_speed * endurancePercent
-        """
+    def decreaseMoveCountdown(self, km_state):
+        if kmui.Released in (km_state.left,km_state.right,km_state.up,km_state.down):
+            self.movementCountdown = 0
+        super().decreaseMoveCountdown()
     
     def move(self, km_state):
+        """
+        override Moveable.move() to let the movement be decided by the keyboard input
+        """
         if km_state.left == kmui.Down:
             super().move('left')
         if km_state.right == kmui.Down:

@@ -7,6 +7,7 @@ import math
 import pygame
 import parameters as p
 from baseEnviroObj import BaseEnviroObj
+import kmui
 
 class Movable(BaseEnviroObj):
     '''
@@ -25,6 +26,10 @@ class Movable(BaseEnviroObj):
         self.edgecheck = envirogrid.edgecondition
         self.pos = envirogrid.getcenter #convCoordToPos
         
+        # limit the rate of movement with a frame countdown
+        self.rateOfMovement = 6 
+        self.movementCountdown = 0
+        
     def move(self, direction=None):
         """
         Please only use 1, 0, or -1 for 'x' and 'y' as they will later be 
@@ -40,31 +45,42 @@ class Movable(BaseEnviroObj):
             self.direction = (1.0,0.0)
         else:
             self.direction = (0.0,0.0)
-        self.moveForward()            
+        self.moveForward()
     
     def moveToward(self,coord):
         self.direction = unitVec(self.coord, coord)
         self.moveForward()
 
     def moveForward(self):
-#        oldcoord = self.coord
-        newcoord = ( self.coord[0]+self.direction[0]*self.speed, 
-                     self.coord[1]+self.direction[1]*self.speed )
+        if self.movementCountdown <= 0:
+            self.resetMoveCountdown()
 
-        # stay on the screen
-        self.coord = self.edgecheck(newcoord)
+    #        oldcoord = self.coord
+            newcoord = ( self.coord[0]+self.direction[0]*self.speed, 
+                         self.coord[1]+self.direction[1]*self.speed )
+    
+            # stay on the screen
+            self.coord = self.edgecheck(newcoord)
+            
+            # place rect on correct tile position
+            newpos = self.pos(self.coord)
+            if newpos:
+                self.rect.center = newpos
+            else:
+                print("invalid position for protagonist")
+            
+            # stay on the screen
+            #if not pygame.Rect(0,0,p.env_size[0],p.env_size[1]).contains(self.rect):
+            #    self.coord = oldcoord
+            #    self.rect.center = self.place(self.coord)
         
-        # place rect on correct tile position
-        newpos = self.pos(self.coord)
-        if newpos:
-            self.rect.center = newpos
-        else:
-            print("invalid position for protagonist")
-        
-        # stay on the screen
-        #if not pygame.Rect(0,0,p.env_size[0],p.env_size[1]).contains(self.rect):
-        #    self.coord = oldcoord
-        #    self.rect.center = self.place(self.coord)
+    def decreaseMoveCountdown(self):
+        self.movementCountdown -= 1
+        if self.movementCountdown < 0:
+            self.movementCountdown = 0
+            
+    def resetMoveCountdown(self):
+        self.movementCountdown = self.rateOfMovement
 
 def unitVec(pointA, pointB):
     """
