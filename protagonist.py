@@ -82,7 +82,7 @@ class Protagonist(Movable):
                         target.kill()
                     else:
                         # knn
-                        self.knnweights = knn.k_nearest_neighbour_searcher(grid.value_dict, 8, (grid.width-1, grid.height-1),.9,1)
+                        self.knnweights = knn.k_nearest_neighbour_searcher(grid.value_dict, 4, (grid.width-1, grid.height-1),.9,1)
                         self.pathway = dijkstra.search(self.coord, targcoord, self.knnweights)
                 
         # get affected by objects if they're on the same grid tile

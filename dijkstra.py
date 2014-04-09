@@ -17,6 +17,30 @@ def search_helper(cost_path,parent,search_list, KNN_dictionary,Queue):
 			cost_path[element][1]=cost_path[parent][1]+[element]
 		Queue.put([cost_path[element][0],element])
 
+def search_helper2(cost_path,parent,search_list, KNN_dictionary,Queue):
+	for element in search_list:
+
+		if cost_path.get(element)==None:
+			# print(parent)
+			cost_path[element]=[999999,cost_path[parent][1]+[element]]
+		if 0 and 1 not in KNN_dictionary[element][0].keys():
+			temp=0+cost_path[parent][0]
+
+		elif 0 in KNN_dictionary[element][0].keys() and 1 not in KNN_dictionary[element][0].keys() :
+			temp=cost_path[parent][0]-KNN_dictionary[element][0][0][-1]
+
+		elif 1 in KNN_dictionary[element][0].keys() and 0 not in KNN_dictionary[element][0].keys() :
+
+			temp=cost_path[parent][0]+KNN_dictionary[element][0][1][-1]
+
+		else:
+
+			temp=(KNN_dictionary[element][0][1][-1] - KNN_dictionary[element][0][0][-1])+cost_path[parent][0]
+
+		if cost_path[element][0]<temp:
+			cost_path[element][0]=temp
+			cost_path[element][1]=cost_path[parent][1]+[element]
+		Queue.put([cost_path[element][0],element])
 
 
 def neighbour_searcher(parent,KNN_dictionary):
@@ -50,10 +74,11 @@ def search(start, dest, KNN_dictionary):
 	todo=[]
 	Queue=queue.PriorityQueue()
 	# print(start)
-	if KNN_dictionary[start][0].get(0)==None:
-		cost_path[start]=[0,[start]]
-	else:
-		cost_path[start]=[KNN_dictionary[start][0][0][-1],[start]]
+	# if KNN_dictionary[start][0].get(0)==None:
+	cost_path[start]=[0,[start]]
+	# else:
+	# 	cost_path[start]=[KNN_dictionary[start][0][0][-1],[start]]
+	# 	cost_path[start]=[KNN_dictionary[start][0][0][-1],[start]]
 	visited.append(start)
 	todo=neighbour_searcher(start,KNN_dictionary)
 	# print("start and todo",start,todo)
