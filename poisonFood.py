@@ -36,7 +36,7 @@ class PoisonFood(BaseEnviroObj):
         
         # add instance to simulation list groups
         p.allObjects.add(self)
-        #p.g_food.add(self)
+        p.g_poison.add(self)
         
         # give this instance a rect
         #self.rect = PoisonFood.image.get_rect()

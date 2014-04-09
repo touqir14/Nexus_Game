@@ -54,6 +54,7 @@ ant_odor_intensity = 450
 
 # food
 g_food = sprite.Group()
+g_poison = sprite.Group()
 basicFoodDiameter = 15
 basicFood_odor_intensity = 150
 

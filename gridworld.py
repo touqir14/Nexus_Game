@@ -18,15 +18,16 @@ class Block(pygame.sprite.Sprite):
         pygame.draw.rect(self.image,boarderColour,self.rect.inflate(0,0),1)
         self.rect.topleft = pos
         
-        bgc = (20,20,20)
+        self._bgc = (20,20,20)
+        self.other = False
         highlight = 50
-        self.bgc = (bgc,(bgc[0]+highlight,bgc[1]+highlight,bgc[2]+highlight))
+        self.bgc = [self._bgc,(self._bgc[0]+highlight,self._bgc[1]+highlight,self._bgc[2]+highlight),(0,0,0)]
         
     def update(self, mpos):
         # get rect at (0,0) for drawing to the block's .image
         #drawrect = pygame.Rect((0,0),self.rect.size)
         zerorect = pygame.Rect((0,0),self.rect.size)
-        self.image.fill(self.bgc[self.rect.collidepoint(mpos)])
+        self.image.fill(self.bgc[self.rect.collidepoint(mpos) if not self.other else 2])
         pygame.draw.rect(self.image,self.boarderColour,zerorect.inflate(0,0),1)
 
 def floorCoord(coordfunc):

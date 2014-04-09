@@ -53,10 +53,10 @@ class Simulation():
             # place objects with mouse. placeable classes must take (grid, coord) as 
             # variables ie: BasicFood(grid, coord)
             self.placeable = [BasicFood, PoisonFood, Antagonist]
-            # create food items
-            self.placeObjects(BasicFood, 20, envirogrid)
+            # create food items, or do it later?
+            #self.placeObjects(BasicFood, 20, envirogrid)
             # generate poison item
-            self.placeObjects(PoisonFood, 5, envirogrid)
+            #self.placeObjects(PoisonFood, 5, envirogrid)
         
         if mode == 2:
             self.placeable = [Target, BasicFood, PoisonFood]
@@ -80,6 +80,7 @@ class Simulation():
         #self.g_grid.sprite.rect.center = env_screen.get_rect().center
         
         # update background grid
+#         self.overlayweights()
         self.g_grid.update(km_state.mpos)
         
         
@@ -93,6 +94,13 @@ class Simulation():
                 self.g_grid.sprite.removeItemAt(item,mcoord)
             else:
                 self.placeObjectAt(self.placeable[self.placing], self.g_grid.sprite, mcoord)
+                
+        # maintain a certain number of objects on the screen
+        if self.mode == 1:
+            if len(p.g_food) < 20:
+                self.placeObjects(BasicFood, 1, self.g_grid.sprite)
+            if len(p.g_poison) < 5:
+                self.placeObjects(PoisonFood, 1, self.g_grid.sprite)
         
         # update necessary things
         p.allObjects.update(km_state, self.g_grid.sprite)
@@ -114,7 +122,43 @@ class Simulation():
     
     def drawWorld(self, screen):
         self.g_grid.draw(screen)
+        
+#     def overlayweights(self):
+#         pro = p.protagonist.sprite
+#         if pro:
+#             weights = pro.knnweights
+#         if weights:
+#             heaviest = {}
+#             for k,v in weights.items():
+#                 d,win = v
+#                 heaviest[k] = d[win][-1]
+#             
+#             low = min(heaviest, key=lambda x: heaviest[x])
+#             high = max(heaviest, key=lambda x: heaviest[x])
+#             
+#             new = {}
+#             for k,v in heaviest.items():
+#                 new[k] = self.map255(v, heaviest[low], heaviest[high])
+#             print(new)
+#             
+#             grid = self.g_grid.sprite
+#             for k,v in new.items():
+#                 grid.blockdict[k].sprite.other = True
+#                 print(v)
+#                 grid.blockdict[k].sprite.bgc[2] = (v,v,v)
+#                 
+#             print('#####')
+#             l = set(heaviest.values())
+#             for i in l:
+#                 print(i)
     
+    def map255(self, val, in_min, in_max, out_min=50, out_max=200):
+        # taken from arduino.cc
+        if (in_max - in_min) + out_min < 0.000000001:
+            return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+        else:
+            return 0
+
     def displayStats(self, screen):
         ## protagonist health bar
         drawText("Health:",screen,(10,1))

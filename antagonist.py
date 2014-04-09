@@ -20,7 +20,7 @@ class Antagonist(Movable):
     image.fill(p.ant_colour)
     
     # how much the hero (or any environment object?) will be affected by this type of game object
-    effectvalue = -50
+    effectvalue = -20
 
     # a value is given to all environment object classes that tell them if the hero likes them or not
     # 0 means not...
