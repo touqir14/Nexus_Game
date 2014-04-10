@@ -1,9 +1,3 @@
-'''
-Created on 2014-02-19
-
-@author: User
-'''
-from pygame import sprite
 import parameters as p
 import pygame
 from odor import OdorSource
@@ -12,11 +6,11 @@ from baseEnviroObj import BaseEnviroObj
 from pygame.colordict import THECOLORS
 
 class BasicFood(BaseEnviroObj):
-    '''
-    classdocs
-    '''
-    # add this class to the odors list so it has a smell in the environment
-    #p.odors.append(__name__)
+    """
+    The green food pellets on the grid. the hero can travel to the same 
+    tile as one of these items to gain some health points
+    """
+
     # one image for all the food instances
     image = pygame.Surface((p.basicFoodDiameter,p.basicFoodDiameter))
     colour = THECOLORS['forestgreen']
@@ -24,7 +18,7 @@ class BasicFood(BaseEnviroObj):
     # how much the hero (or any environment object?) will be affected by this type of game object
     effectvalue = 15
 
-    # set food value to positive
+    # set food value to positive for KNN functions
     value = 1
         
     def __init__(self, envirogrid, startcoord=(0,0)):
@@ -32,18 +26,11 @@ class BasicFood(BaseEnviroObj):
         Constructor
         '''
         super().__init__(BasicFood.image, envirogrid, startcoord)
-        # initialize Sprite() so this instance can be updated and drawn
-        #sprite.Sprite.__init__(self)
         
         # add instance to simulation list groups
         p.allObjects.add(self)
         p.g_food.add(self)
         
-        # give this instance a rect
-        #self.rect = BasicFood.image.get_rect()
-        #self.rect.center = coord
-        #self.coord = (float(self.rect.center[0]),float(self.rect.center[1]))
-
         # give this instance an odor so it has a smell in the environment
         OdorSource(__name__,GroupSingle(self),p.basicFood_odor_intensity,BasicFood.colour)
         

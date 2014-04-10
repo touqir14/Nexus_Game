@@ -1,10 +1,6 @@
-'''
-Created on 2014-03-28
-
-@author: User
-'''
 import pygame
 import math
+import kmui
 
 
 class Block(pygame.sprite.Sprite):
@@ -45,7 +41,7 @@ class GridWorld(pygame.sprite.Sprite):
     #g_Grid = pygame.sprite.GroupSingle()
     g_Blocks = pygame.sprite.Group()
 
-    def __init__(self, env_rect, Gunit, Gwidth, Gheight):
+    def __init__(self, env_rect, Gunit, Gwidth, Gheight, km_state):
         '''
         Create a new grid where Gunit is the width and height of each tile ie. the unit size,
         Gwidth and G height are the number of tiles across and dorwn respectively.
@@ -61,7 +57,7 @@ class GridWorld(pygame.sprite.Sprite):
         #GridWorld.g_Grid.add(self)
         
         # outside grid boarder
-        boarderColour = (200,200,30)
+        boarderColour = (50,50,30)
         pygame.draw.rect(self.image,boarderColour,self.rect,1)
         
         # clear old blocks (do this somewhere else please)
@@ -81,7 +77,7 @@ class GridWorld(pygame.sprite.Sprite):
                 GridWorld.g_Blocks.add(self.blockdict[(x,y)].sprite)
         
         GridWorld.g_Blocks.draw(self.image)
-        
+
         # move rects by offset amount (grid is centered on screen)
         xoffset = (env_rect.width - self.rect.width)//2
         yoffset = (env_rect.height - self.rect.height)//2
@@ -140,10 +136,10 @@ class GridWorld(pygame.sprite.Sprite):
         """
         override kill method to kill grid block sprites as well
         """
-        blocks = GridWorld.g_Blocks.sprites()
+        blocks = list(GridWorld.g_Blocks.sprites())
         for b in blocks:
             b.kill()
-        pygame.sprite.Sprite.kill(self)
+        super().kill()
         
     @floorCoord
     def getcenter(self, coord):

@@ -1,17 +1,13 @@
-'''
-Created on 2014-02-20
-
-@author: User
-'''
-from pygame.sprite import Sprite, Group
+from pygame.sprite import Sprite
 import parameters as p
 import pygame
-from pygame.colordict import THECOLORS
 once = 0
 tid = 0
 class OdorSource(Sprite):
-    '''
-    '''
+    """
+    odors are not currently used in the game simulations.
+    at this point they are only a visualization that you can turn on with the 'o' key
+    """
 
     def __init__(self, odor_type, sourceSpriteGroup, intensity=100, colour=(120,120,120)):
         '''

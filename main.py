@@ -8,7 +8,6 @@ Run the program from this main file.
 import os, sys, pygame
 from pygame.locals import *
 import parameters as p
-from simulation import Simulation
 from basicFood import BasicFood
 from introPage import IntroPage
 from poisonFood import PoisonFood
@@ -57,6 +56,7 @@ if __name__ == '__main__':
     
     # other housekeeping (some image setup needs to go after 'pygame.init()')
     imageSetup()
+    sim = None
     
     #
     iPage = IntroPage(lambda: km_state.mpos)
@@ -83,9 +83,18 @@ if __name__ == '__main__':
                         p.startup = True
                 if e.key == K_o:
                     p.show_odors^=True # toggle true false
+                if e.key == K_v:
+                    p.weightvisual ^= True
+                    if sim != None and not p.weightvisual:
+                        bd = sim.g_grid.sprite
+                        for b in bd.blockdict.keys():
+                            bd.blockdict[b].sprite.other = False
+                    
             if e.type in (MOUSEBUTTONDOWN,MOUSEBUTTONUP,MOUSEMOTION,KEYDOWN,KEYUP):
                 km_state.updateState(e)
                 
+        km_state.eHandle()
+        
         if p.startup:
             #iPage.update(km_state.mpos)
             # create a new simulation
@@ -104,10 +113,8 @@ if __name__ == '__main__':
             # run simulation
             sim.run(env_screen, km_state)
             
-            # proliferate odors
+            # proliferate odors (this is no longer used but it looks cool! press [o] in game to see)
             if p.show_odors: p.odorSources.update()
-            #for i in p.odorSources:
-            #    i.proliferate()
             
             # draw the environment
             sim.drawWorld(env_screen)
@@ -123,18 +130,6 @@ if __name__ == '__main__':
             screen.blit(info_screen,(p.border,p.resolution[1]-p.info_size[1]-p.border))
 
         pygame.display.flip()
-
-        #adjust game speed with mouse wheel
-        pro = p.protagonist.sprite
-        if pro:
-            if km_state.m_wheel == kmui.Up:
-                pro.k_of_KNN += 1
-            elif km_state.m_wheel == kmui.Down:
-                pro.k_of_KNN -= 1
-                if pro.k_of_KNN < 1:
-                    pro.k_of_KNN = 1
-            elif km_state.k == kmui.Released:
-                pro.approach_of_KNN ^= True
             
         # refresh mouse state at end of every loop
         km_state.refresh()

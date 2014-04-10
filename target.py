@@ -1,12 +1,5 @@
-'''
-Created on 2014-04-09
-
-@author: User
-'''
 import pygame
-import parameters as p
 from baseEnviroObj import BaseEnviroObj
-
 
 class Target(BaseEnviroObj):
     '''
@@ -26,8 +19,6 @@ class Target(BaseEnviroObj):
         Constructor
         '''
         super().__init__(Target.image, envirogrid, startcoord)
-#        self.rect = Target.image.get_rect()
         
-#        p.allObjects.add(self)
         Target.g_targ.add(self)
 

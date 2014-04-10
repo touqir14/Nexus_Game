@@ -5,6 +5,8 @@ Created on 2014-02-19
 
 The global values of the simulation.
 Stored here for easy access.
+
+decided to stop using this global module but still working on the conversion.
 '''
 from pygame import sprite
 from pygame.colordict import THECOLORS
@@ -33,6 +35,7 @@ startingFood = 100
 health_step_decrease = 0.07
 endurance_decrease = 3.0
 endurance_increase = 1.0
+weightvisual = True
 
 # Protagonist
 protagonist = sprite.GroupSingle()
@@ -64,11 +67,3 @@ timeStep = 0
 # odors
 show_odors = False
 odorSources = sprite.Group()
-
-# keyboard input stuff
-#up = False
-#down = False
-#left = False
-#right = False
-
-# leftMouse = False

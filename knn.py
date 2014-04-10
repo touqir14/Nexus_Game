@@ -1,7 +1,6 @@
 import random
 import time
 import math
-from dijkstra import search
 
 
 sigmoid=lambda x:(2 / (1 + math.exp(-x))) #I have added some details about this function in a document
@@ -16,8 +15,11 @@ def factorial(f):
     362880
     """
     result=1
+
     for i in range(f):
+
         result*=(i+1)
+
     return result
 
 def combination_calc(n,r):
@@ -29,6 +31,7 @@ def combination_calc(n,r):
     10
     """
     combination=(factorial(n)/(factorial(n-r)*factorial(r)))
+
     return combination
 
 def binomial_distribution(k,positive,negative,gamma):
@@ -38,18 +41,26 @@ def binomial_distribution(k,positive,negative,gamma):
     I have also uploaded a document explaining how i use gamma and how i derive decay from it.
     That document also also refers to the formula of binomial_distribution
     """
-    # print("positive is {}, negative is {}".format(positive,negative))
     probability=[]
+
     decay=1
+
     combined=positive+negative
+
     combination_constant=[combination_calc(k,len(positive)),combination_calc(k,len(negative))]
-    # print(len(combined))
+
     for i in range(k):
+
         decay*=(gamma**combined[i])
+
     positive_theta=len(positive)/k
+
     negative_theta=len(negative)/k
-    # print(decay,positive_theta,negative_theta)
+
+    #The below "probability.append" creates probability for positive points and stores it in probability[0]. The forumala can be found in my uploaded document
     probability.append((positive_theta)**len(positive) * (1-positive_theta)**len(negative) *combination_constant[0]*decay)
+
+    #The below "probability.append" creates probability for negative points and stores it in probability[1]. The forumala can be found in my uploaded document
     probability.append((negative_theta)**len(negative) * (1-negative_theta)**len(positive) *combination_constant[1]*decay)
     return probability
 
@@ -62,38 +73,52 @@ def weight_assigner(points_dict,classtype):
     """
     
     weight_dict={}
+
     total_weight_list=[]
+
     total_weight_list2=[]
-    for i in classtype:
+
+    for p_class in classtype:
+
         total_weight=0
-        for j in points_dict[i]:
 
-            if i not in weight_dict.keys():
-                weight_dict[i]=[]
+        #points_dict actually has a list containing distances between neighbours of specific class and query box. 
+        for distance in points_dict[p_class]:
 
-            weight_dict[i].append(sigmoid(-j))
-            total_weight+=sigmoid(-j)
+            if p_class not in weight_dict.keys():
 
-        weight_dict[i].append(total_weight)
-        total_weight_list.append([total_weight,i])
+                weight_dict[p_class]=[]
+
+            weight_dict[p_class].append(sigmoid(-distance))
+
+            total_weight+=sigmoid(-distance)
+
+        weight_dict[p_class].append(total_weight)
+
+        total_weight_list.append([total_weight,p_class])
+
         total_weight_list2.append(total_weight)
 
     max_weight=max(total_weight_list)
 
     # if there is only 1 maximum weight, we select that class which has this weight as the dominant class 
     if total_weight_list2.count(max_weight[0])==1:
+
         dominant_class=max_weight[1]
-        #print(dominant_class)
+
     #in case if we have multiple equal maximum weights, we randomnly choose a dominant weight
     else:
+
         max_weight_classes=[]
+
         for x,y in total_weight_list:
+
             if x==max_weight[0]:
+
                 max_weight_classes.append(y)
 
         dominant_class=random.choice(max_weight_classes)
-        #print(dominant_class)
-    # print (weight_dict)
+
     return [weight_dict,dominant_class]
     
 
@@ -105,25 +130,38 @@ def sampler(times,size,points,point_class):
     This returns a sampled_dict that contains a list of occurences of each class represented with distance
     This is discussed in detail in my documents.
     """
-    distance=points[0][0]
-    probability_boundary={}
-    probability={}
-    total_frequency=len(points)
-    classtype={}
-    total_class=len(point_class)
-    sampled_dict={}
-    for i in point_class:
-        classtype[i]=[]
-        for j in points:
-            if j[1]==i:
-                classtype[i].append(j[:2])
 
-        probability[i]=len(classtype[i])/total_frequency
+    distance=points[0][0]
+
+    probability_boundary={}
+
+    probability={}
+
+    total_frequency=len(points)
+
+    classtype={}
+
+    total_class=len(point_class)
+
+    sampled_dict={}
+
+    for p_class in point_class:
+
+        classtype[p_class]=[]
+
+        for point in points:
+
+            if point[1]==p_class:
+
+                classtype[p_class].append(point[:2])
+
+        probability[p_class]=len(classtype[p_class])/total_frequency
     
 
     for index in range(total_class):
         
         if index==0:
+
             probability_boundary[point_class[index]]=[0,probability[point_class[index]]]
 
         elif index==total_class-1 :
@@ -131,27 +169,35 @@ def sampler(times,size,points,point_class):
             probability_boundary[point_class[index]]=[1-probability[point_class[index]],1]
 
         else:
+
             previous_right_boundary=probability_boundary[point_class[index-1]][1]
+
             probability_boundary[point_class[index]]=[previous_right_boundary,probability[point_class[index]]+previous_right_boundary]
 
-    # print("boundary",probability_boundary)
-    # print("probability",probability)
+
 
     r1 = random.SystemRandom()
+
     for i in range(size):
+
         rand_no=0
+
         for j in range(times):
-            # random.seed(random.uniform(0,1000))
-            # r1 = random.SystemRandom()
+
             rand_no+=(1*r1.uniform(0,1))
-            # time.sleep(0.05)
+
         mean_rand=rand_no/times
-        # print("mean")
-        for k in point_class:
-            if probability_boundary[k][0]<mean_rand and probability_boundary[k][1]>=mean_rand:
-                if k not in sampled_dict.keys():
-                    sampled_dict[k]=[]
-                sampled_dict[k].append(distance)
+
+        for p_class in point_class:
+
+            if probability_boundary[p_class][0]<mean_rand and probability_boundary[p_class][1]>=mean_rand:
+
+                if p_class not in sampled_dict.keys():
+
+                    sampled_dict[p_class]=[]
+
+                sampled_dict[p_class].append(distance)
+
     return sampled_dict
 
 def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
@@ -161,112 +207,148 @@ def Probabilistic_KNN(k,KNN,point_dictionary,gamma,flag):
     This is discussed in detail in my document
     """
     keys=KNN.keys()
+
     KNN_weights={}
+
     KNN_probability={}
 
-    # print(list(keys).sort())
+
     for key in keys: 
+
         positive=[]
+
         negative=[]
+        #spoints contain sampled points
+
         spoints=[]
-    
-        # print('key {}'.format(key))
+
+
         if len(KNN[key])>k: #In case our KNN has more points than kpoints and we need to create fake samples
-            # print('1st worlde {}'.format(key))
-            distance=KNN[key][-1][0]
+
+            distance=KNN[key][-1][0] #We take into account the last k_point in the list as we also know that it has greatest distance from the query box
+            #and actually find other points of its distance and remove those points and send them to sampler. I have discussed about it in my document. 
+
             index=-1
+
             for i in KNN[key]:
                 
                 index+=1
-                # print(index)
+
                 if i[0]==distance:
+
                     first_half=KNN[key][ :index]
+
                     second_half=KNN[key][index:-1]
+
                     second_half+=[KNN[key][-1]]
+
                     break
 
-            for i in first_half:
-                if point_dictionary[tuple(i[1])]==[1]:
-                    positive.append(i[0])
-                if point_dictionary[tuple(i[1])]==[0]:
-                    negative.append(i[0])
+            for point in first_half:
 
-            # print(second_half,distance,index)
+                if point_dictionary[tuple(point[1])]==[1]:
 
-            for i in second_half:
-                # print(i)
-                if point_dictionary[tuple(i[1])]==[1]:
-                    spoints.append([i[0],1])
-                if point_dictionary[tuple(i[1])]==[0]:
-                    spoints.append([i[0],0])
+                    positive.append(point[0])
 
-            spoints_dict={}
-            # print(spoints)
+                if point_dictionary[tuple(point[1])]==[0]:
+
+                    negative.append(point[0])
+
+
+
+            for point in second_half:
+
+                if point_dictionary[tuple(point[1])]==[1]:
+    
+                    spoints.append([point[0],1])
+    
+                if point_dictionary[tuple(point[1])]==[0]:
+    
+                    spoints.append([point[0],0])
+
+            spoints_dict={} #should contain the dictionary that will be returned by the sampler
+
             spoints_dict=sampler(3,k-len(first_half),spoints,[0,1])
-            # print("first_half {}".format(first_half))
-            # print(spoints_dict)
-            # print(positive)
-            # print(negative)
+
             if 1 in spoints_dict.keys():
+    
                 positive+=spoints_dict[1]
+    
             if 0 in spoints_dict.keys():
+    
                 negative+=spoints_dict[0]
 
-            # print(positive)
-            # print(negative)
 
-            # print(positive,negative)
             if flag==0:
 
                 probability=binomial_distribution(k,positive,negative,gamma)
+    
                 KNN_probability[key]=[{0:[probability[1]],1:[probability[0]]},max(probability[0],probability[1])]
 
             elif flag==1:
+    
                 _dict = {}
+    
                 if len(positive) > 0:
+    
                     _dict[1]=positive
+    
                 if len(negative) > 0:
+    
                     _dict[0]=negative
-                temp=weight_assigner(_dict,list(_dict.keys()))
-                # print('temp {}'.format(temp))
-                KNN_weights[key]=temp
+    
+                #Here weight is a list which contains a weight dictionary and a dominant class(the class that has the greatest cumulative weight)
+    
+                weight=weight_assigner(_dict,list(_dict.keys()))
 
-            # print("k is great")
+                KNN_weights[key]=weight
+
 
         if len(KNN[key])<=k:
         
 
-            for i in KNN[key]:
+            for point in KNN[key]:
                 
-                if point_dictionary[tuple(i[1])]==[1]:
-                    positive.append(i[0])
-                if point_dictionary[tuple(i[1])]==[0]:
-                    negative.append(i[0])
+                if point_dictionary[tuple(point[1])]==[1]:
+    
+                    positive.append(point[0])
+    
+                if point_dictionary[tuple(point[1])]==[0]:
+    
+                    negative.append(point[0])
 
-            # print(KNN[key])
 
             if flag==0:
 
                 probability=binomial_distribution(len(KNN[key]),positive,negative,gamma)
+    
                 KNN_probability[key]=[{0:[probability[1]],1:[probability[0]]},max(probability[0],probability[1])]
 
             elif flag==1:
+    
                 _dict = {}
+    
                 if len(positive) > 0:
+    
                     _dict[1]=positive
+    
                 if len(negative) > 0:
+    
                     _dict[0]=negative
-                temp=weight_assigner(_dict,list(_dict.keys()))
-                # print('temp {}'.format(temp))
-                KNN_weights[key]=temp
-                # print(temp)
+    
+                #Here weight is a list containing a weight dictionary and dominant class
+
+                weight=weight_assigner(_dict,list(_dict.keys()))
+
+                KNN_weights[key]=weight
                 
-                # print("k is less")
 
     if flag==1:
+    
         return KNN_weights
 
     if flag==0:
+    
         return KNN_probability
 
 
@@ -280,11 +362,12 @@ def k_search(k,point_list,class_dictionary):
     """
     
     knn_points=[]
+    
     for i in point_list:
-        # print(i)
+
         if len(class_dictionary[tuple(i[1])])!=0:
+    
             knn_points.append(i)
-            # print(i)
 
     return knn_points
             
@@ -297,7 +380,9 @@ def manhattan_distance(point1,point2):
     4
     """
     p1 = point1[0]-point2[0]
+    
     p2 = point1[1]-point2[1]
+    
     return abs(p1)+abs(p2)
 
 
@@ -308,28 +393,46 @@ def k_nearest_neighbour_searcher(grid_dictionary,k,size,gamma=0.9,flag=1):
     This is discussed in detail in my document
     """
     KNN={}
+    
     KNN_weights={}
+    
     KNN_probability={}
+    
     move_up=(0,-1) 
+    
     move_down=(0,1) 
+    
     move_left=(-1,0) 
+    
     move_right=(1,0)
-    present_k=0
+    
     todo=[]
+    
     to_visit=[]
-    k_points=[]
+    
     for box in grid_dictionary.keys():
+    
         if len(grid_dictionary[box])==0:
+    
             todo.append(box)
-    # print(todo)
+
     for box in todo:
+    
+        present_k=0
+    
         counter=0
+    
         boundary=[]
+    
         to_visit=[]
+    
         prev_visit=[box]
+    
+        k_points=[]       
         
-        
+
         while(present_k<k):
+    
             counter+=1
                 
             for cell in prev_visit:
@@ -402,18 +505,17 @@ def k_nearest_neighbour_searcher(grid_dictionary,k,size,gamma=0.9,flag=1):
                         to_visit.append([cell[0]+move_right[0],cell[1]])
 
             if len(to_visit)==0: #This will be true in case we assign a k greater than the total number of points
-
                 break
 
             prev_visit=[]
 
             dist=[]
 
-            for i in to_visit:
+            for point in to_visit:
 
-                prev_visit.append(i)
+                prev_visit.append(point)
 
-                dist.append([manhattan_distance(i,box),i])
+                dist.append([manhattan_distance(point,box),point])
 
 
             to_visit=[]
@@ -424,67 +526,19 @@ def k_nearest_neighbour_searcher(grid_dictionary,k,size,gamma=0.9,flag=1):
 
         
         KNN[tuple(box)]=k_points
-    # print('nineteenfour {}'.format(KNN[(19,4)]))
-    # print("KNN {}".format(KNN))
+
     if flag==0:
 
         KNN_probability=Probabilistic_KNN(k,KNN,grid_dictionary,gamma,0)
+       
         return KNN_probability
         
     if flag==1:
 
         KNN_weights=Probabilistic_KNN(k,KNN,grid_dictionary,gamma,1)
-        print(KNN_weights)
+       
         return KNN_weights
 
-        #print('okay pointses {}'.format(KNN))
     
 
-#===============================================================================
-# 
-# if __name__=='__main__':
-#     # # point_dict={(2,2):[1],(1,3):[0],(2,4):[],(3,3):[],(4,4):[]}
-#     # # point_dict={(2,2):[1],(1,3):[0],(2,4):[1],(3,3):[1],(4,4):[0]}
-# 
-#     # grid_dictionary={(4,2):[0],(5,3):[],(4,3):[1],(3,3):[],(6,4):[],(5,4):[],(4,4):[],(3,4):[],(2,4):[0],(5,5):[0],(4,5):[0],(3,5):[1],(4,6):[0]}
-#     # positive=[[1,(4,3)],[2,(3,5)]]
-#     # negative=[[1,(4,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]
-#     # # print(k_search(1,points,point_dict))
-#     # # print(factorial(5))
-#     # # print(combination_calc(96,3))
-#     # # #print("|{}|".)
-#     # # print(binomial_distribution(7,[[1],[3],[4]],[[1],[2],[5],[6]],0.9))
-#     # # print(sampler(3,3,points,[0,1]))
-#     # KNN={(4,4):[[1,(4,3)],[2,(3,5)],[2,(4,6)],[2,(5,5)],[2,(4,2)],[2,(2,4)]]}
-#     # # print(KNN)
-#     # points_dict={0:[1,2,2,3],1:[1,1,1,2]}
-#     # # print(Probabilistic_KNN(7,KNN,grid_dictionary,0.9))
-#     # # print(sigmoid(0.458))
-#     # temp=weight_assigner(points_dict,[0,1])
-#     # #print(temp[0],temp[1])
-#     # #print(sigmoid(-1))
-#             
-# 
-# 
-#     dictionary={}
-#     for i in range(5):
-#         for j in range(5):
-#             dictionary[i,j]=[]
-# 
-#     dictionary[2,0]=[1]
-#     dictionary[0,3]=[1]
-#     dictionary[1,1]=[1]
-#     dictionary[1,3]=[1]
-#     dictionary[3,1]=[0]
-#     dictionary[3,3]=[1]
-#     dictionary[1,4]=[0]
-#     dictionary[2,4]=[0]
-#     hi=k_nearest_neighbour_searcher(dictionary,5,[4,4],0.9,0)
-#     # print(hi)
-#     # for i in hi.keys():
-#     #     print (i, hi[i][0][0][-1])
-# 
-#     print(search((0,4),(3,4),hi))
-#     print(hi)
-#     # print(hi)
-#===============================================================================
+

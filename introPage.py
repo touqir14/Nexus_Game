@@ -1,8 +1,3 @@
-'''
-Created on 2014-02-26
-
-@author: User
-'''
 import pygame
 import parameters as p
 import simulation
@@ -12,7 +7,10 @@ from gridworld import GridWorld
 
 class IntroPage():
     '''
-    classdocs
+    This is the menu screen that shows between simulations. you click 
+    on it's buttons to start the next game.
+    
+    Call the menu with the ESCAPE key!
     '''
 
     def __init__(self, mousepos):
@@ -34,16 +32,19 @@ class IntroPage():
         self.btn2color = lambda: self.highlight if self.opt2_rect.collidepoint(mousepos()) else self.btncolor
         self.btn3color = lambda: self.highlight if self.opt3_rect.collidepoint(mousepos()) else self.btncolor
         
-    def generateSim(self, km_state, env_rect, gridunit, gridwidth, gridheight):        
+    def generateSim(self, km_state, env_rect, gridunit, gridwidth, gridheight): 
+        """
+        This method is called from main to create a new game simulation.
+        """       
         if km_state.m_left == kmui.Released:
             if self.btn1color() == self.highlight:
                 # start the game with settings for user control
-                grid = GridWorld(env_rect, gridunit, gridwidth, gridheight)
-                return simulation.Simulation(env_rect, grid, mode=1)
+                grid = GridWorld(env_rect, gridunit, gridwidth, gridheight, km_state)
+                return simulation.Simulation(env_rect, grid, km_state, mode=1)
             elif self.btn2color() == self.highlight:
                 # start the game with settings for avoiding the obstacles
-                grid = GridWorld(env_rect, gridunit, gridwidth, gridheight)
-                return simulation.Simulation(env_rect, grid, mode=2)
+                grid = GridWorld(env_rect, gridunit, gridwidth, gridheight, km_state)
+                return simulation.Simulation(env_rect, grid, km_state, mode=2)
             elif self.btn3color() == self.highlight:
                 # exit the game
                 pygame.quit()
@@ -76,11 +77,11 @@ class IntroPage():
         # option one
         #(btncolor[0]+self.opt1_highlight,btncolor[1]+self.opt1_highlight,btncolor[2]+self.opt1_highlight)
         pygame.draw.rect(screen,self.btn1color(),self.opt1_rect)
-        simulation.drawText("User Controlled", screen, (self.opt1_rect.center[0]-80,self.opt1_rect.center[1]-9), 30)
+        simulation.drawText("Survival Mode", screen, (self.opt1_rect.center[0]-70,self.opt1_rect.center[1]-9), 30)
         
         # option two
         pygame.draw.rect(screen,self.btn2color(),self.opt2_rect)
-        simulation.drawText("Automatic Avoid", screen, (self.opt2_rect.center[0]-80,self.opt2_rect.center[1]-9), 30)
+        simulation.drawText("KNN Path Finding", screen, (self.opt2_rect.center[0]-85,self.opt2_rect.center[1]-9), 30)
         
         # option three
         pygame.draw.rect(screen,self.btn3color(),self.opt3_rect)

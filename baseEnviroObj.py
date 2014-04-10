@@ -1,10 +1,4 @@
-'''
-Created on 2014-04-04
-
-@author: User
-'''
 import pygame
-import parameters as p
 import math
 
 class BaseEnviroObj(pygame.sprite.Sprite):
@@ -20,14 +14,14 @@ class BaseEnviroObj(pygame.sprite.Sprite):
         '''
         super().__init__()
         self.rect = image.get_rect()
-        # give position
-        #startcoord = envirogrid.convPosToCoord(startpos)
+
         # be sure that coord is on map
         self._coord = envirogrid.closestGridCoord(startcoord)
+        
         #self.coord = startcoord
         self.rect.center = envirogrid.getcenter(self.coord)
         
-        # give health
+        # give health. should be overridden as needed by subclasses
         self.max_health = 1.0
         self.health = self.max_health
         
