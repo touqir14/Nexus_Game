@@ -57,7 +57,12 @@ class Antagonist(Movable):
             targcoord = dijkstra.chaser(self.coord, pro.coord, grid.value_dict)
 #             print(targcoord)
             self.moveToward(targcoord)
-
+            
+        # get affected by objects if they're on the same grid tile
+        for o in p.allObjects.sprites():
+            if o.coord == self.coord and o != self:
+                o.affectHealth(self, grid.value_dict)
+        
     def affectHealth(self, env_obj, touqirs_value_dict):
         """
         overridden to not die but instead gain health from the hero
@@ -65,7 +70,7 @@ class Antagonist(Movable):
         # hurt the hero a little bit
         env_obj.health += self.effectvalue
         # eat the hero a little bit
-        self.health += env_obj.effectvalue
+        #self.health += env_obj.effectvalue
         if self.value in touqirs_value_dict[self.coord]:
             touqirs_value_dict[self.coord].remove(self.value)
         # regulate obj health. dead?

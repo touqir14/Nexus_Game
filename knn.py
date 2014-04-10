@@ -434,6 +434,7 @@ def k_nearest_neighbour_searcher(grid_dictionary,k,size,gamma=0.9,flag=1):
     if flag==1:
 
         KNN_weights=Probabilistic_KNN(k,KNN,grid_dictionary,gamma,1)
+        print(KNN_weights)
         return KNN_weights
 
         #print('okay pointses {}'.format(KNN))

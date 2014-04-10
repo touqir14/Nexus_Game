@@ -47,11 +47,13 @@ class Protagonist(Movable):
         self.health = self.max_health
         
         # adjust rate of movement from Moveable class
-        self.rateOfMovement = 4
+        self.rateOfMovement = 3
         
         # knn memoization
         self.knnweights = None
         self.pathway = []
+        self.k_of_KNN = 8
+        self.approach_of_KNN = 0
 
     def update(self, km_state, grid):
         """
@@ -82,7 +84,7 @@ class Protagonist(Movable):
                         target.kill()
                     else:
                         # knn
-                        self.knnweights = knn.k_nearest_neighbour_searcher(grid.value_dict, 8, (grid.width-1, grid.height-1),.9,1)
+                        self.knnweights = knn.k_nearest_neighbour_searcher(grid.value_dict, self.k_of_KNN, (grid.width-1, grid.height-1),.9,self.approach_of_KNN)
                         self.pathway = dijkstra.search(self.coord, targcoord, self.knnweights)
                 
         # get affected by objects if they're on the same grid tile
@@ -112,3 +114,14 @@ class Protagonist(Movable):
         #if self.endurance <= 0:
         #    self.endurance = 0.0
         
+    def affectHealth(self, env_obj, touqirs_value_dict):
+        """
+        overridden to not die while causing an effect to other screen objects
+        """
+        # hurt the hero a little bit
+        env_obj.health += self.effectvalue
+        # eat the hero a little bit
+        #self.health += env_obj.effectvalue
+        # regulate obj health. dead?
+        env_obj.regulatehealth()
+

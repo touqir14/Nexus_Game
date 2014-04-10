@@ -124,13 +124,17 @@ if __name__ == '__main__':
 
         pygame.display.flip()
 
-        # adjust game speed with mouse wheel
-#         if km_state.m_wheel == kmui.Up:
-#             p.fps += 2
-#         elif km_state.m_wheel == kmui.Down:
-#             p.fps -= 2
-#             if p.fps < 5:
-#                 p.fps = 5
+        #adjust game speed with mouse wheel
+        pro = p.protagonist.sprite
+        if pro:
+            if km_state.m_wheel == kmui.Up:
+                pro.k_of_KNN += 1
+            elif km_state.m_wheel == kmui.Down:
+                pro.k_of_KNN -= 1
+                if pro.k_of_KNN < 1:
+                    pro.k_of_KNN = 1
+            elif km_state.k == kmui.Released:
+                pro.approach_of_KNN ^= True
             
         # refresh mouse state at end of every loop
         km_state.refresh()

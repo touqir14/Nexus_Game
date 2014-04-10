@@ -52,7 +52,9 @@ class Simulation():
 
             # place objects with mouse. placeable classes must take (grid, coord) as 
             # variables ie: BasicFood(grid, coord)
+            
             self.placeable = [BasicFood, PoisonFood, Antagonist]
+            
             # create food items, or do it later?
             #self.placeObjects(BasicFood, 20, envirogrid)
             # generate poison item
@@ -60,6 +62,7 @@ class Simulation():
         
         if mode == 2:
             self.placeable = [Target, BasicFood, PoisonFood]
+            
             # create food items
             self.placeObjects(BasicFood, 30, envirogrid)
             # generate poison item
@@ -79,8 +82,8 @@ class Simulation():
         # centre grid on screen
         #self.g_grid.sprite.rect.center = env_screen.get_rect().center
         
-        # update background grid
-#         self.overlayweights()
+        #update background grid
+        #self.overlayweights()
         self.g_grid.update(km_state.mpos)
         
         
@@ -123,30 +126,36 @@ class Simulation():
     def drawWorld(self, screen):
         self.g_grid.draw(screen)
         
-#     def overlayweights(self):
-#         pro = p.protagonist.sprite
-#         if pro:
-#             weights = pro.knnweights
-#         if weights:
-#             heaviest = {}
-#             for k,v in weights.items():
-#                 d,win = v
-#                 heaviest[k] = d[win][-1]
-#             
-#             low = min(heaviest, key=lambda x: heaviest[x])
-#             high = max(heaviest, key=lambda x: heaviest[x])
-#             
-#             new = {}
-#             for k,v in heaviest.items():
-#                 new[k] = self.map255(v, heaviest[low], heaviest[high])
-#             print(new)
-#             
-#             grid = self.g_grid.sprite
-#             for k,v in new.items():
-#                 grid.blockdict[k].sprite.other = True
-#                 print(v)
-#                 grid.blockdict[k].sprite.bgc[2] = (v,v,v)
-#                 
+    def overlayweights(self):
+        pro = p.protagonist.sprite
+        if pro:
+            weights = pro.knnweights
+        if weights:
+            heaviest = {}
+            for k,v in weights.items():
+                d,win = v
+                print('')
+                heaviest[k] = d[win][-1]
+                
+            print('#####')
+            for i in heaviest.values():
+                print(i)
+            print('#####')
+             
+            low = min(heaviest, key=lambda x: heaviest[x])
+            high = max(heaviest, key=lambda x: heaviest[x])
+             
+            new = {}
+            for k,v in heaviest.items():
+                new[k] = self.map255(v, heaviest[low], heaviest[high])
+            print(new)
+             
+            grid = self.g_grid.sprite
+            for k,v in new.items():
+                grid.blockdict[k].sprite.other = True
+                #print(v)
+                grid.blockdict[k].sprite.bgc[2] = (v,v,v)
+                 
 #             print('#####')
 #             l = set(heaviest.values())
 #             for i in l:
@@ -181,14 +190,31 @@ class Simulation():
 
         screen.blit(proHealthBar,(9,19))
         
+        # mode specific display
         # timer for user control mode
         if self.mode == 1:
             txt = "Survival time: {}.{}".format(p.timeStep//p.fps,int(p.timeStep%p.fps*3.3))
             drawText(txt,screen,(10,50))
+            
+        # knn stuff for mode 2
+        elif self.mode == 2:
+            pro = p.protagonist.sprite
+            if pro:
+                txt = "k neighbours: {}".format(pro.k_of_KNN)
+                drawText(txt,screen,(325,45))
+                txt = '[mouse wheel] to change'
+                drawText(txt,screen,(325,67),20)
+
+                txt = "KNN approach: {}".format('Weighted' if pro.approach_of_KNN else 'Prababilistic')
+                drawText(txt,screen,(10,45))
+                txt = '[k] to change'
+                drawText(txt,screen,(10,67),20)
         
         # what are I placing with the mouse clicks?
-        pos = (500,65)
+        pos = (600,45)
         drawText("Placing:",screen,pos)
+        drawText("[left mouse] to place",screen,(pos[0],pos[1]+22),20)
+        drawText("[right mouse] to change",screen,(pos[0],pos[1]+40),20)
         imgOfPlacing = self.placeable[self.placing].image
         prect = imgOfPlacing.get_rect()
         screen.blit(imgOfPlacing,((pos[0]+87)-prect.center[0],(pos[1]+8)-prect.center[1]))
