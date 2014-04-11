@@ -1,20 +1,14 @@
-'''
-Created on 2014-02-19
-
-@author: User
-'''
-from pygame.sprite import Sprite, GroupSingle
+from pygame.sprite import GroupSingle
 import parameters as p
 import pygame
 from movable import Movable
 from odor import OdorSource
-import math
-import dijkstra
+import search_algorithms
 
 class Antagonist(Movable):
-    '''
-    classdocs
-    '''
+    """
+    RAWRRR!!!! all i want to do is eat the protagonist!! i will chase it forever!
+    """
     # give the antagonist an image
     image = pygame.Surface((p.ant_diameter,p.ant_diameter))
     image.fill(p.ant_colour)
@@ -23,7 +17,7 @@ class Antagonist(Movable):
     effectvalue = -20
 
     # a value is given to all environment object classes that tell them if the hero likes them or not
-    # 0 means not...
+    # for KNN functions.
     value = 0
 
     def __init__(self, envirogrid, startcoord, mode):
@@ -54,7 +48,7 @@ class Antagonist(Movable):
         self.decreaseMoveCountdown()
         pro = p.protagonist.sprite
         if pro:
-            targcoord = dijkstra.chaser(self.coord, pro.coord, grid.value_dict)
+            targcoord = search_algorithms.A_star_chaser(self.coord, pro.coord, grid.value_dict)
 #             print(targcoord)
             self.moveToward(targcoord)
             
@@ -69,9 +63,9 @@ class Antagonist(Movable):
         """
         # hurt the hero a little bit
         env_obj.health += self.effectvalue
-        # eat the hero a little bit
-        #self.health += env_obj.effectvalue
+
         if self.value in touqirs_value_dict[self.coord]:
             touqirs_value_dict[self.coord].remove(self.value)
+
         # regulate obj health. dead?
         env_obj.regulatehealth()

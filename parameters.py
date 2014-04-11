@@ -5,15 +5,17 @@ Created on 2014-02-19
 
 The global values of the simulation.
 Stored here for easy access.
+
+decided to stop using this global module but still working on the conversion.
 '''
 from pygame import sprite
 from pygame.colordict import THECOLORS
 from random import Random
 
 # setup
-resolution = (800,600)
 border = 2
-env_size = (resolution[0]-border*2,500-border*2)
+resolution = (30*27+border*2,30*17+border*2+100)
+env_size = (resolution[0]-border*2,30*17)
 info_size = (resolution[0]-border*2,100-border)
 fps = 30
 startup = True
@@ -33,6 +35,7 @@ startingFood = 100
 health_step_decrease = 0.07
 endurance_decrease = 3.0
 endurance_increase = 1.0
+weightvisual = True
 
 # Protagonist
 protagonist = sprite.GroupSingle()
@@ -64,11 +67,3 @@ timeStep = 0
 # odors
 show_odors = False
 odorSources = sprite.Group()
-
-# keyboard input stuff
-#up = False
-#down = False
-#left = False
-#right = False
-
-# leftMouse = False

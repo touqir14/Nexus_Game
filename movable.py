@@ -1,20 +1,13 @@
-'''
-Created on 2014-02-19
-
-@author: User
-'''
 import math
-import pygame
-import parameters as p
 from baseEnviroObj import BaseEnviroObj
-import kmui
 
 class Movable(BaseEnviroObj):
     '''
     This class adds motion capability to screen objects like the protagonist.
     object must have a float position called 'pos' and a pygame rect called 'rect'
+    
+    some of the methods were targeted for diagonal movement but they work on a grid anyway.
     '''
-
 
     def __init__(self, speed, envirogrid, image, startcoord=(0,0)):
         '''
