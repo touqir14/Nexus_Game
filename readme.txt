@@ -4,7 +4,7 @@ Touqir Sajed, Matt Jorgensen
 CMPUT 275 B2
 Final project
 
-To play the game, execute main.py file. You will need python 3 for this.
+To play the game, execute main.py file. You will need python 3 for this and pygame installed.
 
 COLLABORATION
 We asked Michael Bowling for advice which we used on many parts of our project 
