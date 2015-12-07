@@ -1,5 +1,6 @@
-Touqir Sajed   1405626
-Matt Jorgensen 1184386
+Contributors:
+Touqir Sajed, Matt Jorgensen   
+ 
 
 CMPUT 275 B2
 Final project
